@@ -1,4 +1,4 @@
-# ConectaMaker — MVP em React
+# ConectaMaker - MVP em React
 
 MVP **demonstrativo** (dados fictícios, tudo salvo no `localStorage`) recriado em React a partir das telas do site hospedado, com a nova funcionalidade **Árvore de adaptações**.
 
