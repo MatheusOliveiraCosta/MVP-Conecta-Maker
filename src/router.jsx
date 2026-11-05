@@ -11,7 +11,7 @@ const parse = () => {
 export function Router({ children }) {
   const [loc, setLoc] = useState(parse)
   useEffect(() => {
-    const on = () => { setLoc(parse()); window.scrollTo({ top: 0 }) }
+    const on = () => { setLoc(parse()); window.scrollTo(0, 0) }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
