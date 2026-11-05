@@ -61,9 +61,6 @@ export function Collaborate() {
   )
 }
 
-// Contorno ilustrativo do Brasil (apenas decorativo)
-const BR = '34,8 44,6 52,10 60,12 70,18 80,24 88,30 93,38 92,46 86,56 80,66 72,76 66,86 58,92 50,86 46,76 42,68 34,64 26,60 18,52 14,42 18,34 24,24 30,14'
-
 export function Network() {
   const [city, setCity] = useState(null)
   const [kind, setKind] = useState('Todos')
@@ -77,10 +74,11 @@ export function Network() {
           <ul className="map-legend"><li><i className="dot-space" />Espaços</li><li><i className="dot-people" />Pessoas</li></ul></div>
         <div className="map-body">
           <div className="map" role="img" aria-label="Mapa ilustrativo do Brasil com as localidades cadastradas">
-            <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points={BR} />
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <image className="map-image" href="/maps/brazil-states.svg" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet" />
               {Object.entries(cityPos).map(([c, [x, y]]) => (
                 <g key={c} className={`pin ${city === c ? 'on' : ''}`} onClick={() => setCity(city === c ? null : c)} transform={`translate(${x} ${y})`}>
-                  <circle r="4.2" className="halo" /><circle r="2" className={peopleByCity[c] ? 'p' : 's'} />
+                  <circle r="2.7" className="halo" /><circle r="1.35" className={peopleByCity[c] ? 'p' : 's'} />
                   {city === c && <text y="-6.5" textAnchor="middle">{c}</text>}
                 </g>
               ))}</svg>
@@ -93,7 +91,7 @@ export function Network() {
             })}
           </div>
         </div>
-        <p className="map-note">Mapa ilustrativo dos cadastros demonstrativos. Pontos posicionados de modo aproximado; não há geolocalização em tempo real.</p>
+        <p className="map-note">Cadastros demonstrativos, sem geolocalização em tempo real. Base: <a href="https://commons.wikimedia.org/wiki/File:Blank_Map_of_Brazil.svg" target="_blank" rel="noreferrer">Blank Map of Brazil.svg</a>, Wikimedia Commons (CC BY-SA 4.0).</p>
       </section>
       <Notice title="Cadastros demonstrativos">Parte dos espaços é fictícia para ilustrar a experiência. Consulte cada instituição para confirmar acesso e funcionamento.</Notice>
       <div className="filters two">
