@@ -4,12 +4,13 @@ import Home from './pages/Home.jsx'
 import { NewProject, ProjectDetail, Projects } from './pages/Projects.jsx'
 import { CourseDetail, Courses, Learn, TrailDetail } from './pages/Learn.jsx'
 import { Collaborate, Network, SpaceDetail, Tools } from './pages/Community.jsx'
+import About from './pages/About.jsx'
 
 const ROUTES = [
   ['/', () => <Home />], ['/projetos', () => <Projects />], ['/projetos/novo', () => <NewProject />],
   ['/projetos/:id', (p) => <ProjectDetail id={p.id} />], ['/aprender', () => <Learn />], ['/aprender/:id', (p) => <TrailDetail id={p.id} />],
   ['/cursos', () => <Courses />], ['/cursos/:id', (p) => <CourseDetail id={p.id} />], ['/colaborar', () => <Collaborate />],
-  ['/rede', () => <Network />], ['/rede/:id', (p) => <SpaceDetail id={p.id} />], ['/ferramentas', () => <Tools />],
+  ['/rede', () => <Network />], ['/rede/:id', (p) => <SpaceDetail id={p.id} />], ['/ferramentas', () => <Tools />], ['/sobre', () => <About />],
 ]
 
 export default function App() {
