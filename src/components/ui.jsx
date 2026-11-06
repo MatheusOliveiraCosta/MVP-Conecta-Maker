@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { LuAccessibility, LuBot, LuBox, LuCalculator, LuCode, LuCpu, LuLeaf, LuLightbulb, LuPalette, LuScissors, LuX } from 'react-icons/lu'
 
 const CATEGORY_STYLE = {
@@ -68,14 +69,14 @@ export function Modal({ title, onClose, children, wide = false }) {
     document.addEventListener('keydown', onKey)
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = overflow; prev?.focus?.() }
   }, [onClose])
-  return (
+  return createPortal((
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className={`modal ${wide ? 'modal-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} ref={ref}>
         <button className="icon-btn modal-close" onClick={onClose} aria-label="Fechar"><LuX /></button>
         {children}
       </div>
     </div>
-  )
+  ), document.body)
 }
 
 export const formatDate = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '')
