@@ -91,6 +91,10 @@ function SoftwareStlPreview({ url, title }) {
         projected[index] = { points, depth: points[0][2] + points[1][2] + points[2][2] }
       }
       projected.sort((a, b) => a.depth - b.depth)
+      const fill = context.createLinearGradient(0, height * .12, 0, height * .88)
+      fill.addColorStop(0, '#63c0c3')
+      fill.addColorStop(.42, '#318f99')
+      fill.addColorStop(1, '#17636e')
       context.save()
       context.globalAlpha = .18
       context.fillStyle = '#317f88'
@@ -98,22 +102,25 @@ function SoftwareStlPreview({ url, title }) {
       context.ellipse(width / 2, height * .78, scale * .48, scale * .1, 0, 0, Math.PI * 2)
       context.fill()
       context.restore()
+      context.fillStyle = fill
       for (const triangle of projected) {
         const [a, b, c] = triangle.points
-        const cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
-        const light = Math.max(.38, Math.min(1, .48 + Math.abs(cross) / (scale * scale * .1)))
         context.beginPath()
         context.moveTo(a[0], a[1])
         context.lineTo(b[0], b[1])
         context.lineTo(c[0], c[1])
         context.closePath()
-        context.fillStyle = `rgb(${Math.round(49 * light)}, ${Math.round(137 * light)}, ${Math.round(149 * light)})`
         context.fill()
-        if (!isWeakDevice) {
-          context.strokeStyle = 'rgba(20, 86, 94, .16)'
-          context.lineWidth = .35
-          context.stroke()
-        }
+      }
+      context.strokeStyle = 'rgba(10, 55, 64, .82)'
+      context.lineWidth = isWeakDevice ? .8 : 1.05
+      context.lineJoin = 'round'
+      for (const edge of modelRef.current.edges) {
+        const [a, b] = edge.map(project)
+        context.beginPath()
+        context.moveTo(a[0], a[1])
+        context.lineTo(b[0], b[1])
+        context.stroke()
       }
     }
     const scheduleDraw = () => {
@@ -160,18 +167,48 @@ function SoftwareStlPreview({ url, title }) {
         const positions = geometry.getAttribute('position').array
         const triangleCount = Math.floor(positions.length / 9)
         const step = Math.max(1, Math.ceil(triangleCount / maxTriangles))
-        const triangles = []
-        for (let triangleIndex = 0; triangleIndex < triangleCount; triangleIndex += step) {
+        const allTriangles = []
+        const edgeMap = new Map()
+        const key = (point) => point.map((value) => Number(value).toFixed(5)).join(',')
+        const registerEdge = (a, b, normal) => {
+          const first = key(a)
+          const second = key(b)
+          const edgeKey = first < second ? `${first}|${second}` : `${second}|${first}`
+          const existing = edgeMap.get(edgeKey)
+          if (existing) existing.normals.push(normal)
+          else edgeMap.set(edgeKey, { points: [a, b], normals: [normal] })
+        }
+        for (let triangleIndex = 0; triangleIndex < triangleCount; triangleIndex += 1) {
           const index = triangleIndex * 9
-          triangles.push([
+          const points = [
             [positions[index], positions[index + 1], positions[index + 2]],
             [positions[index + 3], positions[index + 4], positions[index + 5]],
             [positions[index + 6], positions[index + 7], positions[index + 8]],
-          ])
+          ]
+          const ab = points[1].map((value, component) => value - points[0][component])
+          const ac = points[2].map((value, component) => value - points[0][component])
+          const normal = [
+            ab[1] * ac[2] - ab[2] * ac[1],
+            ab[2] * ac[0] - ab[0] * ac[2],
+            ab[0] * ac[1] - ab[1] * ac[0],
+          ]
+          const length = Math.hypot(...normal) || 1
+          const normalized = normal.map((value) => value / length)
+          allTriangles.push({ points, normal: normalized })
+          registerEdge(points[0], points[1], normalized)
+          registerEdge(points[1], points[2], normalized)
+          registerEdge(points[2], points[0], normalized)
         }
+        const triangles = []
+        for (let triangleIndex = 0; triangleIndex < allTriangles.length; triangleIndex += step) {
+          triangles.push(allTriangles[triangleIndex].points)
+        }
+        const edges = [...edgeMap.values()]
+          .filter(({ normals }) => normals.length === 1 || normals.slice(1).some((other) => normals[0].reduce((sum, value, index) => sum + value * other[index], 0) < .82))
+          .map(({ points }) => points)
         geometry.dispose()
         if (disposed) return
-        modelRef.current = { triangles }
+        modelRef.current = { triangles, edges }
         setStatus('ready')
         scheduleDraw()
       })
