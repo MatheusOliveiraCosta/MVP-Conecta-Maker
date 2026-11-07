@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
-import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2 } from 'react-icons/lu'
+import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2, LuMapPin, LuPrinter, LuShoppingBag, LuCpu } from 'react-icons/lu'
 import AdaptationTree from '../components/AdaptationTree.jsx'
 import VariantModal from '../components/VariantModal.jsx'
-import { Chip, Cover, Notice, PageHeader, Avatar } from '../components/ui.jsx'
-import { CATEGORIES, LEVELS } from '../data/seed.js'
+import { Chip, Cover, PageHeader, Avatar } from '../components/ui.jsx'
+import { CATEGORIES, LEVELS, suppliers } from '../data/seed.js'
 import { Link, useRouter } from '../router.jsx'
 import { useStore } from '../store.jsx'
 
@@ -240,7 +240,7 @@ function StlPreview({ url, title }) {
 
 function ProjectResources({ resources = [] }) {
   if (!resources.length) return null
-  return <section className="project-resources" aria-label="Arquivos e referências do projeto">
+  return <section className="project-resources detail-section" aria-label="Arquivos e referências do projeto">
     <h2>Arquivos e referências</h2>
     <div className="resource-list">
       {resources.map((resource) => <article className={`resource-card resource-${resource.type}`} key={`${resource.type}-${resource.url}`}>
@@ -257,6 +257,27 @@ function ProjectResources({ resources = [] }) {
         {resource.type === 'embed' && <iframe className="resource-embed" title={resource.title} src={resource.url} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />}
       </article>)}
     </div>
+  </section>
+}
+
+function ManufacturingGuide({ project }) {
+  const [filter, setFilter] = useState('Todos')
+  const filters = ['Todos', 'Impressão 3D', 'Filamento PLA', 'Componentes eletrônicos']
+  const listed = suppliers.filter((supplier) => filter === 'Todos' || supplier.offers.includes(filter))
+  return <section className="manufacturing-guide" aria-label="Onde fabricar e comprar materiais">
+    <div className="manufacturing-head">
+      <div><p className="eyebrow">Produção local</p><h2>Precisa fabricar?</h2><p className="muted">Encontre exemplos de espaços e fornecedores para transformar este projeto em uma atividade prática.</p></div>
+      <span className="chip chip-warn">Cadastros demonstrativos</span>
+    </div>
+    <div className="manufacturing-context"><LuPrinter /><span>Este projeto usa <strong>{project.materials?.join(', ') || 'materiais a definir'}</strong>. Consulte o local antes de se deslocar para confirmar preço, prazo, agenda e estoque.</span></div>
+    <div className="manufacturing-filters" aria-label="Filtrar fornecedores"><span className="muted small">Estou procurando:</span>{filters.map((item) => <button key={item} className={`btn btn-secondary btn-sm ${filter === item ? 'is-on' : ''}`} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
+    <div className="supplier-grid">{listed.map((supplier) => <article className="supplier-card" key={supplier.id}>
+      <div className="between"><span className="supplier-icon">{supplier.kind.includes('Eletrônica') ? <LuCpu /> : supplier.kind.includes('Materiais') ? <LuShoppingBag /> : <LuPrinter />}</span><span className="chip chip-outline">{supplier.kind}</span></div>
+      <h3>{supplier.name}</h3><p className="muted">{supplier.summary}</p><p className="supplier-location"><LuMapPin /> {supplier.city}</p>
+      <div className="tag-row">{supplier.offers.map((offer) => <span className="chip chip-plain" key={offer}>{offer}</span>)}</div>
+      <Link to={`/rede/${supplier.spaceId}`} className="btn btn-secondary btn-sm">Ver local na Rede Maker <LuArrowRight /></Link>
+    </article>)}</div>
+    {!listed.length && <p className="empty">Nenhum fornecedor de exemplo para este filtro.</p>}
   </section>
 }
 
@@ -321,6 +342,7 @@ export function ProjectDetail({ id }) {
   const [variantFor, setVariantFor] = useState(null)
   const [highlight, setHighlight] = useState(null)
   const [comment, setComment] = useState('')
+  const [showManufacturing, setShowManufacturing] = useState(false)
 
   useEffect(() => { document.title = p ? `${p.title} — ConectaMaker` : 'ConectaMaker'; return () => { document.title = 'ConectaMaker — Cultura maker para educação' } }, [p])
   if (!p) return <div className="empty"><p>Projeto não encontrado.</p><Link to="/projetos" className="btn btn-secondary">Voltar aos projetos</Link></div>
@@ -348,6 +370,14 @@ export function ProjectDetail({ id }) {
         <div className="tag-row">{p.tags?.map((t) => <Chip key={t}>{t}</Chip>)}</div>
         <dl className="info-grid">{info.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
+        <section className="detail-section detail-section-fabrication" aria-labelledby="manufacturing-spotlight-title">
+          <div className="manufacturing-spotlight">
+            <div><p className="eyebrow">Do projeto à prática</p><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
+            <button className={`btn btn-amber manufacturing-spotlight-button ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Ver fornecedores e serviços'}</button>
+          </div>
+          {showManufacturing && <div id="manufacturing-guide"><ManufacturingGuide project={p} /></div>}
+        </section>
+
         <div className="actions">
           <button className={`btn btn-secondary ${saved ? 'is-on' : ''}`} onClick={() => { toggleSaved(p.id); notify(saved ? 'Projeto removido dos salvos.' : 'Projeto salvo!') }} aria-pressed={saved}><LuHeart /> {saved ? 'Projeto salvo' : 'Salvar projeto'}</button>
           <button className="btn btn-secondary" onClick={() => notify('Registramos seu interesse em aprender a fazer.')}>Quero aprender a fazer</button>
@@ -356,25 +386,21 @@ export function ProjectDetail({ id }) {
           <button className="btn btn-secondary" onClick={() => notify('Obrigado! Contribuições são registradas neste navegador.')}>Posso contribuir</button>
         </div>
 
-        {p.needsEquipment && (
-          <Notice title="Não tenho este equipamento">
-            Explore espaços cadastrados para encontrar recursos de fabricação. <Link to="/rede" className="btn btn-secondary btn-sm">Encontrar laboratório →</Link>
-          </Notice>
-        )}
-
-        {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <><h2>Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></>}
+        {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <section className="detail-section detail-section-steps" aria-labelledby="steps-title"><h2 id="steps-title">Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></section>}
 
         <ProjectResources resources={p.resources} />
 
         <AdaptationTree projects={projects} currentId={p.id} highlightId={highlight} onCreate={setVariantFor} />
 
-        <h2>Comentários e aprendizados</h2>
-        {comments.length ? <ul className="comments">{comments.map((c) => <li key={c.id}><strong>{c.author}</strong><p>{c.text}</p></li>)}</ul> : <p className="muted">Seja a primeira pessoa a compartilhar um aprendizado.</p>}
-        <form onSubmit={(e) => { e.preventDefault(); if (!comment.trim()) return notify('Escreva um comentário antes de publicar.'); addComment(p.id, comment.trim()); setComment('') }}>
-          <label htmlFor="comment">Compartilhe uma ideia ou adaptação</label>
-          <textarea id="comment" rows={4} value={comment} onChange={(e) => setComment(e.target.value)} />
-          <button className="btn btn-primary" type="submit">Publicar comentário</button>
-        </form>
+        <section className="detail-section comments-section" aria-labelledby="comments-title">
+          <h2 id="comments-title">Comentários e aprendizados</h2>
+          {comments.length ? <ul className="comments">{comments.map((c) => <li key={c.id}><strong>{c.author}</strong><p>{c.text}</p></li>)}</ul> : <p className="muted">Seja a primeira pessoa a compartilhar um aprendizado.</p>}
+          <form onSubmit={(e) => { e.preventDefault(); if (!comment.trim()) return notify('Escreva um comentário antes de publicar.'); addComment(p.id, comment.trim()); setComment('') }}>
+            <label htmlFor="comment">Compartilhe uma ideia ou adaptação</label>
+            <textarea id="comment" rows={4} value={comment} onChange={(e) => setComment(e.target.value)} />
+            <button className="btn btn-primary" type="submit">Publicar comentário</button>
+          </form>
+        </section>
       </article>
       {variantFor && <VariantModal parent={variantFor} onClose={() => setVariantFor(null)} onPublished={published} />}
     </>
@@ -382,7 +408,7 @@ export function ProjectDetail({ id }) {
 }
 
 function ProjectTopics({ topics }) {
-  return <section className="project-topics" aria-label="Documentação do projeto">
+  return <section className="project-topics detail-section" aria-label="Documentação do projeto">
     <h2>Documentação do projeto</h2>
     {topics.map((topic, i) => <article className="topic" key={topic.id || i}>
       <h3>{topic.title || `Tópico ${i + 1}`}</h3>
