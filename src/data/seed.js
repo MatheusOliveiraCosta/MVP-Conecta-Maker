@@ -1,30 +1,31 @@
 // Dados fictícios do MVP (baseados nas telas do site hospedado).
 // Cada projeto pode ter `parentId`: é assim que a Árvore de adaptações é montada.
 
-import rotinaAnalogicaCover from '../../rotina-analogica.png'
-import rotinaEletronicaCover from '../../rotina-eletronica.png'
-import tabuadaCover from '../../tabuada.png'
-import tabuadaScratchCover from '../../jogo-tabuada-scratch-act.png'
-import portasLogicasCover from '../../portas-logicas.png'
-import hortaCover from '../../horta-automatizada.png'
-import semaforoCover from '../../semaforo-arduino.png'
-import matematicaScratchCover from '../../matematica-scratch.png'
-import portaCoposCover from '../../porta-copos-impresso-3d.png'
-import portaCoposRecicladoCover from '../../porta-copos-reciclado.png'
-import portaCoposTatilCover from '../../porta-copos-tatil.png'
-import luminariaCover from '../../luminaria-cristo-cornelio.png'
-import trilhaFabricacaoCover from '../../luminaria-cristo-cornelio (1).png'
-import trilhaCorteCover from '../../maquina-de-corte-na-pratica.png'
-import trilhaNoCodeCover from '../../trilha-no-code.webp'
-import trilhaEletronicaCover from '../../trilha-eletronica-basica.png'
-import trilhaProgramacaoCover from '../../trilha-introducao-programacao.png'
-import trilhaCulturaMakerCover from '../../cultura-maker-sala-de-aula.png'
-import trilhaArduinoCover from '../../semaforo-arduino (1).png'
-import trilhaModelagemCover from '../../porta-copos-impresso-3d (1).png'
-import trilhaAcessibilidadeCover from '../../rotina-analogica (1).png'
-import cursoScratchCover from '../../curso-scratch-criativo.png'
-import cursoModelagemCover from '../../curso-fundamentos-modelagem-3d.png'
-import cursoRoboticaCover from '../../seguidor-de-linha.png'
+const image = (name) => `${import.meta.env.BASE_URL}images/${name}`
+const rotinaAnalogicaCover = image('projeto-rotina-analogica.png')
+const rotinaEletronicaCover = image('projeto-rotina-eletronica.png')
+const tabuadaCover = image('projeto-tabuada-interativa.png')
+const tabuadaScratchCover = image('projeto-jogo-tabuada-scratch.png')
+const portasLogicasCover = image('projeto-portas-logicas.png')
+const hortaCover = image('projeto-horta-automatizada.png')
+const semaforoCover = image('projeto-semaforo-arduino.png')
+const matematicaScratchCover = image('projeto-jogo-matematica-scratch.png')
+const portaCoposCover = image('projeto-porta-copos-3d.png')
+const portaCoposRecicladoCover = image('projeto-porta-copos-reciclado.png')
+const portaCoposTatilCover = image('projeto-porta-copos-tatil.png')
+const luminariaCover = image('projeto-luminaria-cristo-cornelio.png')
+const trilhaFabricacaoCover = image('trilha-fabricacao-digital.png')
+const trilhaCorteCover = image('trilha-maquina-de-corte.png')
+const trilhaNoCodeCover = image('trilha-desenvolvimento-no-code.webp')
+const trilhaEletronicaCover = image('trilha-eletronica-basica.png')
+const trilhaProgramacaoCover = image('trilha-introducao-programacao.png')
+const trilhaCulturaMakerCover = image('trilha-cultura-maker.png')
+const trilhaArduinoCover = image('trilha-arduino-iniciantes.png')
+const trilhaModelagemCover = image('trilha-modelagem-3d.png')
+const trilhaAcessibilidadeCover = image('trilha-acessibilidade.png')
+const cursoScratchCover = image('curso-programacao-scratch.png')
+const cursoModelagemCover = image('curso-modelagem-impressao-3d.png')
+const cursoRoboticaCover = image('curso-robotica-seguidor-linha.png')
 export const CATEGORIES = ['Acessibilidade', 'Eletrônica', 'Matemática', 'Sustentabilidade', 'Robótica', 'Programação', 'Arte e Design', 'Educação']
 export const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
 
