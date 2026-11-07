@@ -9,9 +9,9 @@ import { TrailCard } from './Learn.jsx'
 import { SpaceCard } from './Community.jsx'
 
 const bannerPhotos = [
-  `${import.meta.env.BASE_URL}images/trilha-cultura-maker.png`,
-  `${import.meta.env.BASE_URL}images/projeto-horta-automatizada.png`,
-  `${import.meta.env.BASE_URL}images/projeto-semaforo-arduino.png`,
+  `${import.meta.env.BASE_URL}images/Frame%2013.png`,
+  `${import.meta.env.BASE_URL}images/Frame%2014.png`,
+  `${import.meta.env.BASE_URL}images/Frame%2015.png`,
 ]
 
 const Head = ({ title, to, label }) => <div className="section-head tight"><h2>{title}</h2><Link to={to} className="btn btn-secondary btn-sm">{label} <LuArrowRight /></Link></div>

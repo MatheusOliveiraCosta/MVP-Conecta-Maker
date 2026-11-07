@@ -170,9 +170,8 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 /* ---------- home ---------- */
 .hero { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 410px; border-radius: 28px; padding: clamp(28px, 5vw, 56px); color: #d7ecef; background: #123e5d; box-shadow: var(--shadow-lg); }
 .hero-photos { position: absolute; inset: 0; z-index: -2; }
-.hero-photo { position: absolute; top: 0; right: 0; width: 60%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity 1.8s ease-in-out; }
+.hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity 1.8s ease-in-out; }
 .hero-photo.is-active { opacity: 1; }
-.hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #123e5d 0%, rgba(18, 62, 93, .97) 43%, rgba(18, 62, 93, .58) 70%, rgba(18, 62, 93, .14) 100%); pointer-events: none; }
 .hero h1 { color: #fff; max-width: 14ch; font-size: clamp(2rem, 4.4vw, 3.2rem); margin-bottom: 1rem; } .hero p { max-width: 60ch; font-size: 1.08rem; }
 .hero .eyebrow { color: var(--mint); letter-spacing: .14em; }
 .hero .actions { margin-top: 1.4rem; position: relative; }
@@ -276,8 +275,6 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 }
 @media (max-width: 680px) {
   .logo span { display: none; } .grid-2, .grid-3, .info-grid, .two-col { grid-template-columns: 1fr; } .filters.two { grid-template-columns: 1fr; }
-  .hero-photo { width: 100%; }
-  .hero::before { background: linear-gradient(90deg, rgba(18, 62, 93, .96), rgba(18, 62, 93, .7)); }
   .tree-canvas { height: 440px; } .tree-legend { max-width: calc(100% - 24px); bottom: 30px; } .tree-hint { display: none; } .tree-controls .with-text span { display: none; }
   .lessons li, .row-card { flex-direction: column; align-items: stretch; } .modal { padding: 22px 18px; } .city-grid { grid-template-columns: 1fr; }
   .resource-head { flex-direction: column; } .resource-head .actions { justify-content: flex-start; }
