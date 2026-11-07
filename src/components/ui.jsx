@@ -19,7 +19,7 @@ export function Cover({ category, icon, image, shape = 'rect', className = '' })
   const s = CATEGORY_STYLE[category] || CATEGORY_STYLE.Educação
   const Icon = icon || s.icon
   return (
-    <div className={`cover cover-${shape} ${className}`} style={{ '--c1': s.from, '--c2': s.to }} aria-hidden="true">
+    <div className={`cover cover-${shape} ${image ? 'has-image' : ''} ${className}`} style={{ '--c1': s.from, '--c2': s.to }} aria-hidden="true">
       {image ? <img className="cover-image" src={image} alt="" /> : <><i className="cover-dots" /><Icon className="cover-icon" /></>}
     </div>
   )
