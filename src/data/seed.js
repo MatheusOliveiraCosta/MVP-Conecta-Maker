@@ -195,6 +195,16 @@ export const spaces = [
   { id: 'gajac', name: 'Laboratórios Maker GaJac — IFPR Jacarezinho', city: 'Jacarezinho', uf: 'PR', kind: 'Instituto federal', short: 'Garagem dos Jacarezinhos: dois espaços de cultura maker para desenvolvimento de protótipos, projetos 3D, fabricação digital, eletrônica e robótica.', equipment: ['Impressoras 3D', 'Scanner 3D', 'Corte a laser CNC', 'Computadores'], hours: 'Seg–sex, 8h–18h (exemplo)', skills: 'Fabricação digital, Robótica' },
 ]
 
+// Ofertas demonstrativas para ilustrar o marketplace educacional do pitch.
+// Os nomes, disponibilidade e locais ainda precisam ser confirmados com parceiros reais.
+export const suppliers = [
+  { id: 'fabricacao-uenp', name: 'Espaço Maker UENP', kind: 'Impressão 3D', city: 'Cornélio Procópio · PR', spaceId: 'uenp', summary: 'Impressão de peças pequenas para projetos educacionais e protótipos.', offers: ['Impressão 3D', 'Filamento PLA', 'Apoio para fatiamento'] },
+  { id: 'fablab-vale', name: 'Fab Lab Vale Criativo', kind: 'Impressão 3D', city: 'Curitiba · PR', spaceId: 'fablab', summary: 'Espaço de prototipagem para preparar, imprimir e testar peças.', offers: ['Impressão 3D', 'Filamento PLA', 'Modelagem 3D'] },
+  { id: 'suprimentos-londrina', name: 'Maker Suprimentos Norte', kind: 'Materiais e filamentos', city: 'Londrina · PR', spaceId: 'horizonte', summary: 'Exemplo de loja parceira para encontrar filamentos e materiais de fabricação.', offers: ['Filamento PLA', 'Filamento PETG', 'Bicos e acessórios'] },
+  { id: 'componentes-campus', name: 'Eletrônica Campus Norte', kind: 'Componentes eletrônicos', city: 'São Paulo · SP', spaceId: 'norte', summary: 'Exemplo de fornecedor local para montar circuitos e protótipos.', offers: ['Jumpers', 'LEDs', 'Resistores', 'Protoboard', 'Sensores'] },
+  { id: 'componentes-gajac', name: 'Laboratórios Maker GaJac', kind: 'Eletrônica e fabricação', city: 'Jacarezinho · PR', spaceId: 'gajac', summary: 'Laboratório demonstrativo com apoio para fabricação digital e eletrônica.', offers: ['Impressão 3D', 'Jumpers', 'LEDs', 'Arduino', 'Filamento PLA'] },
+]
+
 // Pessoas por cidade (para o mapa da Rede Maker)
 export const peopleByCity = { 'Cornélio Procópio': 1, Curitiba: 1, Londrina: 1 }
 // Posições ajustadas à projeção do SVG do Brasil (viewBox 0–100).

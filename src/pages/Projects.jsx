@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
-import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2 } from 'react-icons/lu'
+import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2, LuMapPin, LuPrinter, LuShoppingBag, LuCpu } from 'react-icons/lu'
 import AdaptationTree from '../components/AdaptationTree.jsx'
 import VariantModal from '../components/VariantModal.jsx'
 import { Chip, Cover, Notice, PageHeader, Avatar } from '../components/ui.jsx'
-import { CATEGORIES, LEVELS } from '../data/seed.js'
+import { CATEGORIES, LEVELS, suppliers } from '../data/seed.js'
 import { Link, useRouter } from '../router.jsx'
 import { useStore } from '../store.jsx'
 
@@ -260,6 +260,27 @@ function ProjectResources({ resources = [] }) {
   </section>
 }
 
+function ManufacturingGuide({ project }) {
+  const [filter, setFilter] = useState('Todos')
+  const filters = ['Todos', 'Impressão 3D', 'Filamento PLA', 'Componentes eletrônicos']
+  const listed = suppliers.filter((supplier) => filter === 'Todos' || supplier.offers.includes(filter))
+  return <section className="manufacturing-guide" aria-label="Onde fabricar e comprar materiais">
+    <div className="manufacturing-head">
+      <div><p className="eyebrow">Produção local</p><h2>Precisa fabricar?</h2><p className="muted">Encontre exemplos de espaços e fornecedores para transformar este projeto em uma atividade prática.</p></div>
+      <span className="chip chip-warn">Cadastros demonstrativos</span>
+    </div>
+    <div className="manufacturing-context"><LuPrinter /><span>Este projeto usa <strong>{project.materials?.join(', ') || 'materiais a definir'}</strong>. Consulte o local antes de se deslocar para confirmar preço, prazo, agenda e estoque.</span></div>
+    <div className="manufacturing-filters" aria-label="Filtrar fornecedores"><span className="muted small">Estou procurando:</span>{filters.map((item) => <button key={item} className={`btn btn-secondary btn-sm ${filter === item ? 'is-on' : ''}`} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
+    <div className="supplier-grid">{listed.map((supplier) => <article className="supplier-card" key={supplier.id}>
+      <div className="between"><span className="supplier-icon">{supplier.kind.includes('Eletrônica') ? <LuCpu /> : supplier.kind.includes('Materiais') ? <LuShoppingBag /> : <LuPrinter />}</span><span className="chip chip-outline">{supplier.kind}</span></div>
+      <h3>{supplier.name}</h3><p className="muted">{supplier.summary}</p><p className="supplier-location"><LuMapPin /> {supplier.city}</p>
+      <div className="tag-row">{supplier.offers.map((offer) => <span className="chip chip-plain" key={offer}>{offer}</span>)}</div>
+      <Link to={`/rede/${supplier.spaceId}`} className="btn btn-secondary btn-sm">Ver local na Rede Maker <LuArrowRight /></Link>
+    </article>)}</div>
+    {!listed.length && <p className="empty">Nenhum fornecedor de exemplo para este filtro.</p>}
+  </section>
+}
+
 export function ProjectCard({ p, parent }) {
   const { state } = useStore()
   return (
@@ -321,6 +342,7 @@ export function ProjectDetail({ id }) {
   const [variantFor, setVariantFor] = useState(null)
   const [highlight, setHighlight] = useState(null)
   const [comment, setComment] = useState('')
+  const [showManufacturing, setShowManufacturing] = useState(false)
 
   useEffect(() => { document.title = p ? `${p.title} — ConectaMaker` : 'ConectaMaker'; return () => { document.title = 'ConectaMaker — Cultura maker para educação' } }, [p])
   if (!p) return <div className="empty"><p>Projeto não encontrado.</p><Link to="/projetos" className="btn btn-secondary">Voltar aos projetos</Link></div>
@@ -353,8 +375,11 @@ export function ProjectDetail({ id }) {
           <button className="btn btn-secondary" onClick={() => notify('Registramos seu interesse em aprender a fazer.')}>Quero aprender a fazer</button>
           <button className="btn btn-secondary" onClick={() => navigate('/colaborar')}>Tenho uma necessidade parecida</button>
           <button className="btn btn-secondary" onClick={() => setVariantFor(p)}><LuGitBranch /> Criar remix</button>
+          <button className={`btn btn-primary ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing}><LuPrinter /> {showManufacturing ? 'Ocultar fabricação' : 'Precisa fabricar?'}</button>
           <button className="btn btn-secondary" onClick={() => notify('Obrigado! Contribuições são registradas neste navegador.')}>Posso contribuir</button>
         </div>
+
+        {showManufacturing && <ManufacturingGuide project={p} />}
 
         {p.needsEquipment && (
           <Notice title="Não tenho este equipamento">
