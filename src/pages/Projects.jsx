@@ -372,7 +372,7 @@ export function ProjectDetail({ id }) {
 
         <section className="detail-section detail-section-fabrication" aria-labelledby="manufacturing-spotlight-title">
           <div className="manufacturing-spotlight">
-            <div><p className="eyebrow">Do projeto à prática</p><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
+            <div><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
             <button className={`btn btn-amber manufacturing-spotlight-button ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Ver fornecedores e serviços'}</button>
           </div>
           {showManufacturing && <div id="manufacturing-guide"><ManufacturingGuide project={p} /></div>}
