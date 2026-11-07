@@ -381,12 +381,6 @@ export function ProjectDetail({ id }) {
 
         {showManufacturing && <ManufacturingGuide project={p} />}
 
-        {p.needsEquipment && (
-          <Notice title="Não tenho este equipamento">
-            Explore espaços cadastrados para encontrar recursos de fabricação. <Link to="/rede" className="btn btn-secondary btn-sm">Encontrar laboratório →</Link>
-          </Notice>
-        )}
-
         {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <><h2>Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></>}
 
         <ProjectResources resources={p.resources} />
