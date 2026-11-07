@@ -391,7 +391,7 @@ function ProjectTopics({ topics }) {
         <div className="between"><strong>{embed.title || embed.url}</strong><a href={embed.url} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">Abrir <LuExternalLink /></a></div>
         {isAllowedEmbed(embed.url) && <iframe title={embed.title || 'Conteúdo incorporado'} src={embed.url} loading="lazy" allowFullScreen />}
       </div>)}</div>}
-      {!!topic.files?.length && <div className="topic-files"><strong>Arquivos</strong><div className="actions">{topic.files.map((file) => <a className="btn btn-secondary btn-sm" key={file.name} href={file.data} download={file.name}>{file.name} <span className="muted small">{formatSize(file.size)}</span><LuDownload /></a>)}</div></div>}
+      {!!topic.files?.length && <div className="topic-files"><strong>Arquivos</strong><div className="actions">{topic.files.map((file) => <a className="btn btn-secondary btn-sm" key={file.name} href={file.data} download={file.name}>{file.name} <span className="muted small">{formatSize(file.size)}</span><LuDownload /></a>)}</div>{topic.files.filter((file) => file.name.toLowerCase().endsWith('.stl')).map((file) => <article className="resource-card resource-stl" key={`preview-${file.name}`}><div className="resource-head"><div><h3>Prévia 3D · {file.name}</h3><p className="muted">Modelo STL enviado neste tópico.</p></div></div><StlPreview url={file.data} title={file.name} /></article>)}</div>}
     </article>)}
   </section>
 }
