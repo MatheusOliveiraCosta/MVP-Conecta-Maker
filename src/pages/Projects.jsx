@@ -240,7 +240,7 @@ function StlPreview({ url, title }) {
 
 function ProjectResources({ resources = [] }) {
   if (!resources.length) return null
-  return <section className="project-resources" aria-label="Arquivos e referências do projeto">
+  return <section className="project-resources detail-section" aria-label="Arquivos e referências do projeto">
     <h2>Arquivos e referências</h2>
     <div className="resource-list">
       {resources.map((resource) => <article className={`resource-card resource-${resource.type}`} key={`${resource.type}-${resource.url}`}>
@@ -370,9 +370,12 @@ export function ProjectDetail({ id }) {
         <div className="tag-row">{p.tags?.map((t) => <Chip key={t}>{t}</Chip>)}</div>
         <dl className="info-grid">{info.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
-        <section className="manufacturing-spotlight" aria-labelledby="manufacturing-spotlight-title">
-          <div><p className="eyebrow">Do projeto à prática</p><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
-          <button className={`btn btn-amber manufacturing-spotlight-button ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Ver fornecedores e serviços'}</button>
+        <section className="detail-section detail-section-fabrication" aria-labelledby="manufacturing-spotlight-title">
+          <div className="manufacturing-spotlight">
+            <div><p className="eyebrow">Do projeto à prática</p><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
+            <button className={`btn btn-amber manufacturing-spotlight-button ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Ver fornecedores e serviços'}</button>
+          </div>
+          {showManufacturing && <div id="manufacturing-guide"><ManufacturingGuide project={p} /></div>}
         </section>
 
         <div className="actions">
@@ -383,21 +386,21 @@ export function ProjectDetail({ id }) {
           <button className="btn btn-secondary" onClick={() => notify('Obrigado! Contribuições são registradas neste navegador.')}>Posso contribuir</button>
         </div>
 
-        {showManufacturing && <div id="manufacturing-guide"><ManufacturingGuide project={p} /></div>}
-
-        {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <><h2>Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></>}
+        {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <section className="detail-section detail-section-steps" aria-labelledby="steps-title"><h2 id="steps-title">Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></section>}
 
         <ProjectResources resources={p.resources} />
 
         <AdaptationTree projects={projects} currentId={p.id} highlightId={highlight} onCreate={setVariantFor} />
 
-        <h2>Comentários e aprendizados</h2>
-        {comments.length ? <ul className="comments">{comments.map((c) => <li key={c.id}><strong>{c.author}</strong><p>{c.text}</p></li>)}</ul> : <p className="muted">Seja a primeira pessoa a compartilhar um aprendizado.</p>}
-        <form onSubmit={(e) => { e.preventDefault(); if (!comment.trim()) return notify('Escreva um comentário antes de publicar.'); addComment(p.id, comment.trim()); setComment('') }}>
-          <label htmlFor="comment">Compartilhe uma ideia ou adaptação</label>
-          <textarea id="comment" rows={4} value={comment} onChange={(e) => setComment(e.target.value)} />
-          <button className="btn btn-primary" type="submit">Publicar comentário</button>
-        </form>
+        <section className="detail-section comments-section" aria-labelledby="comments-title">
+          <h2 id="comments-title">Comentários e aprendizados</h2>
+          {comments.length ? <ul className="comments">{comments.map((c) => <li key={c.id}><strong>{c.author}</strong><p>{c.text}</p></li>)}</ul> : <p className="muted">Seja a primeira pessoa a compartilhar um aprendizado.</p>}
+          <form onSubmit={(e) => { e.preventDefault(); if (!comment.trim()) return notify('Escreva um comentário antes de publicar.'); addComment(p.id, comment.trim()); setComment('') }}>
+            <label htmlFor="comment">Compartilhe uma ideia ou adaptação</label>
+            <textarea id="comment" rows={4} value={comment} onChange={(e) => setComment(e.target.value)} />
+            <button className="btn btn-primary" type="submit">Publicar comentário</button>
+          </form>
+        </section>
       </article>
       {variantFor && <VariantModal parent={variantFor} onClose={() => setVariantFor(null)} onPublished={published} />}
     </>
@@ -405,7 +408,7 @@ export function ProjectDetail({ id }) {
 }
 
 function ProjectTopics({ topics }) {
-  return <section className="project-topics" aria-label="Documentação do projeto">
+  return <section className="project-topics detail-section" aria-label="Documentação do projeto">
     <h2>Documentação do projeto</h2>
     {topics.map((topic, i) => <article className="topic" key={topic.id || i}>
       <h3>{topic.title || `Tópico ${i + 1}`}</h3>
