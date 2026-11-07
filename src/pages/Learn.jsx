@@ -12,7 +12,7 @@ export function TrailCard({ t }) {
   const pct = Math.round((done / t.lessons.length) * 100)
   return (
     <article className="card">
-      <Cover category={trailCategory[t.icon]} icon={ICONS[t.icon]} />
+      <Cover category={trailCategory[t.icon]} icon={ICONS[t.icon]} image={t.cover} />
       <div className="card-body">
         <h3><Link to={`/aprender/${t.id}`}>{t.title}</Link></h3>
         <p className="muted">{t.summary}</p>
@@ -46,7 +46,7 @@ export function TrailDetail({ id }) {
       <article className="panel detail">
         <p className="eyebrow">{t.level} · {t.modules} {t.unit || 'módulos'}</p>
         <h1>{t.title}</h1><p className="lead">{t.summary}</p>
-        <Cover category={trailCategory[t.icon]} icon={ICONS[t.icon]} className="detail-cover" />
+        <Cover category={trailCategory[t.icon]} icon={ICONS[t.icon]} image={t.cover} className="detail-cover" />
         <div className="progress big" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><i style={{ width: `${pct}%` }} /></div>
         <p className="muted">{done.length} de {t.lessons.length} aulas concluídas · {pct}%</p>
         <h2>Aulas</h2>

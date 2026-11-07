@@ -13,6 +13,15 @@ import portaCoposCover from '../../porta-copos-impresso-3d.png'
 import portaCoposRecicladoCover from '../../porta-copos-reciclado.png'
 import portaCoposTatilCover from '../../porta-copos-tatil.png'
 import luminariaCover from '../../luminaria-cristo-cornelio.png'
+import trilhaFabricacaoCover from '../../luminaria-cristo-cornelio (1).png'
+import trilhaCorteCover from '../../maquina-de-corte-na-pratica.png'
+import trilhaNoCodeCover from '../../trilha-no-code.webp'
+import trilhaEletronicaCover from '../../trilha-eletronica-basica.png'
+import trilhaProgramacaoCover from '../../trilha-introducao-programacao.png'
+import trilhaCulturaMakerCover from '../../cultura-maker-sala-de-aula.png'
+import trilhaArduinoCover from '../../semaforo-arduino (1).png'
+import trilhaModelagemCover from '../../porta-copos-impresso-3d (1).png'
+import trilhaAcessibilidadeCover from '../../rotina-analogica (1).png'
 export const CATEGORIES = ['Acessibilidade', 'Eletrônica', 'Matemática', 'Sustentabilidade', 'Robótica', 'Programação', 'Arte e Design', 'Educação']
 export const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
 
@@ -120,24 +129,34 @@ export const projects = [
 ]
 
 export const trails = [
-  { id: 'fabricacao', title: 'Fabricação digital', summary: 'Do desenho ao protótipo em equipamentos maker.', level: 'Intermediário', modules: 3, icon: 'cut',
+  { id: 'fabricacao', title: 'Fabricação digital', summary: 'Do desenho ao protótipo em equipamentos maker.', level: 'Intermediário', modules: 3, icon: 'cut', cover: trilhaFabricacaoCover,
     lessons: [['Planejamento e segurança', 'Explore conceitos e observe exemplos.'], ['Máquina de corte', 'Experimente na prática com um pequeno desafio.'], ['Prepare uma peça para fabricar', 'Aplique e registre o que aprendeu.']] },
-  { id: 'arduino', title: 'Arduino para iniciantes', summary: 'Simule, programe e teste circuitos simples.', level: 'Iniciante', modules: 3, icon: 'chip',
+  { id: 'arduino', title: 'Arduino para iniciantes', summary: 'Simule, programe e teste circuitos simples.', level: 'Iniciante', modules: 3, icon: 'chip', cover: trilhaArduinoCover,
     lessons: [['Placa e componentes', 'Conheça o Arduino UNO.'], ['Entradas e saídas', 'Acenda LEDs e leia botões.'], ['Semáforo com LEDs', 'Monte seu primeiro projeto.']] },
-  { id: 'modelagem', title: 'Modelagem 3D', summary: 'Crie formas e prepare modelos para impressão.', level: 'Iniciante', modules: 3, icon: 'cube',
+  { id: 'modelagem', title: 'Modelagem 3D', summary: 'Crie formas e prepare modelos para impressão.', level: 'Iniciante', modules: 3, icon: 'cube', cover: trilhaModelagemCover,
     lessons: [['Formas básicas', 'Combine sólidos no TinkerCAD.'], ['Medidas e tolerâncias', 'Ajuste o encaixe das peças.'], ['Exportar para impressão', 'Gere o STL e fatie.']] },
-  { id: 'acessibilidade', title: 'Acessibilidade e tecnologia assistiva', summary: 'Cocrie recursos educacionais com foco nas pessoas.', level: 'Intermediário', modules: 3, icon: 'access',
+  { id: 'acessibilidade', title: 'Acessibilidade e tecnologia assistiva', summary: 'Cocrie recursos educacionais com foco nas pessoas.', level: 'Intermediário', modules: 3, icon: 'access', cover: trilhaAcessibilidadeCover,
     lessons: [['Escutar antes de criar', 'Mapeie necessidades reais.'], ['Prototipar com o público', 'Teste versões simples.'], ['Documentar e compartilhar', 'Registre para outras pessoas adaptarem.']] },
-  { id: 'corte', title: 'Máquina de corte na prática', summary: 'Prepare arquivos, materiais e testes de corte com segurança.', level: 'Iniciante', modules: 4, icon: 'cut',
+  { id: 'corte', title: 'Máquina de corte na prática', summary: 'Prepare arquivos, materiais e testes de corte com segurança.', level: 'Iniciante', modules: 4, icon: 'cut', cover: trilhaCorteCover,
     lessons: [['Segurança', 'Regras básicas de uso.'], ['Preparar o arquivo', 'Vetores e camadas.'], ['Testes de potência', 'Ajuste velocidade e potência.'], ['Primeira peça', 'Corte e monte.']] },
-  { id: 'nocode', title: 'Minicurso de Desenvolvimento No-code', summary: 'Aprenda lógica de programação e acompanhe a criação de um MVP de gestão financeira no Bubble.', level: 'Iniciante', modules: 22, unit: 'aulas', icon: 'code',
+  { id: 'nocode', title: 'Minicurso de Desenvolvimento No-code', summary: 'Aprenda lógica de programação e acompanhe a criação de um MVP de gestão financeira no Bubble.', level: 'Iniciante', modules: 22, unit: 'aulas', icon: 'code', cover: trilhaNoCodeCover,
     lessons: [['Lógica de programação', 'Variáveis, condições e laços.'], ['Primeiros passos no Bubble', 'Interface e elementos.'], ['Banco de dados', 'Tipos de dados e relações.']] },
-  { id: 'eletronica', title: 'Eletrônica básica', summary: 'Circuitos, componentes e experimentos seguros.', level: 'Iniciante', modules: 3, icon: 'chip',
+  { id: 'eletronica', title: 'Eletrônica básica', summary: 'Circuitos, componentes e experimentos seguros.', level: 'Iniciante', modules: 3, icon: 'chip', cover: trilhaEletronicaCover,
     lessons: [['Corrente e tensão', 'Conceitos essenciais.'], ['Componentes', 'Resistores, LEDs e botões.'], ['Experimento seguro', 'Monte um circuito simples.']] },
-  { id: 'programacao', title: 'Introdução à programação', summary: 'Da lógica aos primeiros blocos de código.', level: 'Iniciante', modules: 3, icon: 'code',
+  { id: 'programacao', title: 'Introdução à programação', summary: 'Da lógica aos primeiros blocos de código.', level: 'Iniciante', modules: 3, icon: 'code', cover: trilhaProgramacaoCover,
     lessons: [['Pensamento computacional', 'Quebre problemas em passos.'], ['Blocos de código', 'Sequências e repetições.'], ['Seu primeiro jogo', 'Aplique no Scratch.']] },
-  { id: 'cultura-maker', title: 'Cultura maker na sala de aula', summary: 'Planeje atividades abertas com sua turma.', level: 'Iniciante', modules: 3, icon: 'idea',
+  { id: 'cultura-maker', title: 'Cultura maker na sala de aula', summary: 'Planeje atividades abertas com sua turma.', level: 'Iniciante', modules: 3, icon: 'idea', cover: trilhaCulturaMakerCover,
     lessons: [['O que é cultura maker', 'Princípios e exemplos.'], ['Planejar a atividade', 'Objetivos e materiais.'], ['Avaliar processos', 'Registros e portfólio.']] },
+  { id: 'rotina-eletronica', title: 'Rotina visual com eletrônica', summary: 'Monte indicadores luminosos para apoiar a organização das tarefas diárias.', level: 'Intermediário', modules: 3, icon: 'access', cover: rotinaEletronicaCover,
+    lessons: [['Planejar a rotina visual', 'Organize as atividades e escolha sinais visuais claros.'], ['Montar os indicadores', 'Use LEDs e botões para representar cada etapa.'], ['Programar e testar', 'Programe a sequência e valide com os estudantes.']] },
+  { id: 'tabuada-maker', title: 'Tabuada interativa', summary: 'Construa recursos manipuláveis e jogos para praticar multiplicação.', level: 'Iniciante', modules: 3, icon: 'idea', cover: tabuadaCover,
+    lessons: [['Representar a multiplicação', 'Explore grades e combinações com materiais simples.'], ['Construir o recurso', 'Prepare peças móveis e organize os resultados.'], ['Criar desafios', 'Use o material em atividades colaborativas.']] },
+  { id: 'jogos-matematicos', title: 'Jogos matemáticos com Scratch', summary: 'Transforme desafios de matemática em jogos com programação em blocos.', level: 'Iniciante', modules: 3, icon: 'code', cover: tabuadaScratchCover,
+    lessons: [['Planejar perguntas e fases', 'Defina operações, níveis e regras do jogo.'], ['Programar no Scratch', 'Crie perguntas, respostas e pontuação.'], ['Testar com a turma', 'Ajuste o jogo a partir das tentativas dos estudantes.']] },
+  { id: 'horta-automatizada', title: 'Horta automatizada', summary: 'Monitore a umidade do solo e automatize a irrigação de uma horta.', level: 'Intermediário', modules: 3, icon: 'chip', cover: hortaCover,
+    lessons: [['Conhecer o circuito', 'Identifique sensor de umidade, placa e bomba.'], ['Programar a irrigação', 'Defina quando o sistema deve acionar a água.'], ['Testar e economizar', 'Observe leituras e ajuste o limite de umidade.']] },
+  { id: 'porta-copos-reciclado', title: 'Design sustentável: porta-copos', summary: 'Explore modelagem, materiais reaproveitados e adaptações táteis.', level: 'Iniciante', modules: 3, icon: 'cube', cover: portaCoposRecicladoCover,
+    lessons: [['Desenhar uma peça útil', 'Defina formato, tamanho e uso do porta-copos.'], ['Escolher materiais', 'Compare impressão 3D e materiais reciclados.'], ['Adaptar e validar', 'Adicione marcações táteis e teste a peça.']] },
 ]
 
 export const spaces = [
