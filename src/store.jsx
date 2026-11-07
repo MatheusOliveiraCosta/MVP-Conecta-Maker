@@ -20,7 +20,7 @@ export function StoreProvider({ children }) {
   const notify = useCallback((message) => setToast({ message, id: Date.now() }), [])
   const patch = useCallback((fn) => setState((s) => ({ ...s, ...fn(s) })), [])
 
-  const projects = useMemo(() => [...state.extraProjects, ...seedProjects], [state.extraProjects])
+  const projects = useMemo(() => [...state.extraProjects, ...seedProjects].filter((project) => project.cover), [state.extraProjects])
   const needs = useMemo(() => [...state.extraNeeds, ...seedNeeds], [state.extraNeeds])
 
   const api = useMemo(() => ({

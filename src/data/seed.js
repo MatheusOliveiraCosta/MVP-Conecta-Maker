@@ -1,6 +1,18 @@
 // Dados fictícios do MVP (baseados nas telas do site hospedado).
 // Cada projeto pode ter `parentId`: é assim que a Árvore de adaptações é montada.
 
+import rotinaAnalogicaCover from '../../rotina-analogica.png'
+import rotinaEletronicaCover from '../../rotina-eletronica.png'
+import tabuadaCover from '../../tabuada.png'
+import tabuadaScratchCover from '../../jogo-tabuada-scratch-act.png'
+import portasLogicasCover from '../../portas-logicas.png'
+import hortaCover from '../../horta-automatizada.png'
+import semaforoCover from '../../semaforo-arduino.png'
+import matematicaScratchCover from '../../matematica-scratch.png'
+import portaCoposCover from '../../porta-copos-impresso-3d.png'
+import portaCoposRecicladoCover from '../../porta-copos-reciclado.png'
+import portaCoposTatilCover from '../../porta-copos-tatil.png'
+import luminariaCover from '../../luminaria-cristo-cornelio.png'
 export const CATEGORIES = ['Acessibilidade', 'Eletrônica', 'Matemática', 'Sustentabilidade', 'Robótica', 'Programação', 'Arte e Design', 'Educação']
 export const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
 
@@ -16,7 +28,7 @@ export const ADAPTATION_TYPES = [
 
 export const projects = [
   {
-    id: 'rotina-analogica', title: 'Rotina Diária Analógica — TEA', category: 'Acessibilidade', level: 'Iniciante', duration: '3 horas',
+    id: 'rotina-analogica', cover: rotinaAnalogicaCover, title: 'Rotina Diária Analógica — TEA', category: 'Acessibilidade', level: 'Iniciante', duration: '3 horas',
     summary: 'Painel tátil de tarefas para apoiar a organização da rotina de estudantes.',
     author: 'Espaço Maker UENP', likes: 12, tags: ['TEA', 'Rotina', 'Educação inclusiva'], audience: 'Professores',
     materials: ['MDF', 'Marcadores coloridos', 'Peças móveis'], tools: ['Máquina de corte', 'Inkscape'],
@@ -25,7 +37,7 @@ export const projects = [
     needsEquipment: true, createdAt: '2026-09-02',
   },
   {
-    id: 'rotina-eletronica', parentId: 'rotina-analogica', title: 'Rotina Diária Eletrônica — TEA', category: 'Acessibilidade', level: 'Intermediário', duration: '6 horas',
+    id: 'rotina-eletronica', cover: rotinaEletronicaCover, parentId: 'rotina-analogica', title: 'Rotina Diária Eletrônica — TEA', category: 'Acessibilidade', level: 'Intermediário', duration: '6 horas',
     summary: 'Quadro com indicadores luminosos para acompanhar atividades do dia.',
     author: 'Espaço Maker UENP', likes: 9, tags: ['TEA', 'LEDs'], audience: 'Professores',
     materials: ['MDF', 'LEDs', 'Arduino'], tools: ['Máquina de corte', 'Ferro de solda'],
@@ -33,14 +45,14 @@ export const projects = [
     steps: ['Reaproveite o painel de MDF do projeto original.', 'Monte os LEDs e botões em protoboard.', 'Programe a sequência de tarefas.'], createdAt: '2026-09-20',
   },
   {
-    id: 'tabuada', title: 'Tabuada Interativa', category: 'Matemática', level: 'Iniciante', duration: '4 horas',
+    id: 'tabuada', cover: tabuadaCover, title: 'Tabuada Interativa', category: 'Matemática', level: 'Iniciante', duration: '4 horas',
     summary: 'Recurso manipulável que torna a multiplicação visível e explorável.',
     author: 'Espaço Maker UENP', likes: 17, tags: ['Multiplicação', 'Manipulável'], audience: 'Estudantes do ensino fundamental',
     materials: ['MDF', 'Ímãs', 'Papel adesivo'], tools: ['Máquina de corte'],
     steps: ['Corte a grade 10×10.', 'Imprima os números e cole nas peças.', 'Proponha desafios de multiplicação em duplas.'], createdAt: '2026-08-14',
   },
   {
-    id: 'tabuada-scratch', parentId: 'tabuada', title: 'Jogo da Tabuada — Scratch 2.0', category: 'Matemática', level: 'Iniciante', duration: 'A definir',
+    id: 'tabuada-scratch', cover: tabuadaScratchCover, parentId: 'tabuada', title: 'Jogo da Tabuada — Scratch 2.0', category: 'Matemática', level: 'Iniciante', duration: 'A definir',
     summary: 'Jogo educativo de tabuada em Scratch com tutorial, projeto jogável e material original do ACT/LIAG da Unicamp.',
     author: 'ACT — Aprendizado, Criatividade e Tecnologia / LIAG — Unicamp', likes: 0, tags: ['Scratch', 'Jogos'], audience: 'Estudantes',
     materials: ['Computador'], tools: ['Scratch'],
@@ -48,42 +60,42 @@ export const projects = [
     steps: ['Abra o projeto no Scratch.', 'Personalize os personagens.', 'Teste com a turma.'], createdAt: '2026-10-05',
   },
   {
-    id: 'portas-logicas', title: 'Portas Lógicas', category: 'Eletrônica', level: 'Intermediário', duration: '5 horas',
+    id: 'portas-logicas', cover: portasLogicasCover, title: 'Portas Lógicas', category: 'Eletrônica', level: 'Intermediário', duration: '5 horas',
     summary: 'Painel físico para experimentar as operações E, OU e NÃO.',
     author: 'Espaço Maker UENP', likes: 14, tags: ['Lógica', 'Circuitos'], audience: 'Ensino médio',
     materials: ['MDF', 'Chaves', 'LEDs'], tools: ['Máquina de corte', 'Multímetro'],
     steps: ['Corte a base de MDF.', 'Monte as chaves e LEDs.', 'Verifique a tabela-verdade de cada porta.'], createdAt: '2026-08-30',
   },
   {
-    id: 'horta', title: 'Horta Automatizada', category: 'Sustentabilidade', level: 'Intermediário', duration: '7 horas',
+    id: 'horta', cover: hortaCover, title: 'Horta Automatizada', category: 'Sustentabilidade', level: 'Intermediário', duration: '7 horas',
     summary: 'Protótipo didático que mede a umidade e aciona a irrigação.',
     author: 'Comunidade ConectaMaker', likes: 8, tags: ['IoT', 'Irrigação'], audience: 'Escolas',
     materials: ['Sensor de umidade', 'Bomba d’água', 'Arduino'], tools: ['Ferro de solda'],
     steps: ['Monte o circuito do sensor.', 'Programe o limite de umidade.', 'Instale a bomba e teste.'], createdAt: '2026-07-11',
   },
   {
-    id: 'semaforo', title: 'Semáforo com Arduino', category: 'Robótica', level: 'Iniciante', duration: '2 horas',
+    id: 'semaforo', cover: semaforoCover, title: 'Semáforo com Arduino', category: 'Robótica', level: 'Iniciante', duration: '2 horas',
     summary: 'Aprenda saídas digitais e temporização construindo um semáforo.',
     author: 'Comunidade ConectaMaker', likes: 11, tags: ['Arduino', 'LEDs'], audience: 'Iniciantes',
     materials: ['Arduino UNO', '3 LEDs', 'Resistores'], tools: ['Protoboard'],
     steps: ['Ligue os LEDs ao Arduino.', 'Programe a sequência de cores.', 'Ajuste os tempos.'], createdAt: '2026-07-28',
   },
   {
-    id: 'jogo-matematica', title: 'Jogo de matemática com Scratch', category: 'Programação', level: 'Iniciante', duration: '2 horas',
+    id: 'jogo-matematica', cover: matematicaScratchCover, title: 'Jogo de matemática com Scratch', category: 'Programação', level: 'Iniciante', duration: '2 horas',
     summary: 'Crie um jogo de perguntas para praticar operações matemáticas.',
     author: 'Comunidade ConectaMaker', likes: 7, tags: ['Scratch', 'Jogos'], audience: 'Estudantes',
     materials: ['Computador'], tools: ['Scratch'],
     steps: ['Crie as perguntas.', 'Programe a pontuação.', 'Compartilhe com a turma.'], createdAt: '2026-08-02',
   },
   {
-    id: 'porta-copos', title: 'Porta-copos impresso em 3D', category: 'Arte e Design', level: 'Iniciante', duration: '3 horas',
+    id: 'porta-copos', cover: portaCoposCover, title: 'Porta-copos impresso em 3D', category: 'Arte e Design', level: 'Iniciante', duration: '3 horas',
     summary: 'Peça simples para começar a modelar e imprimir objetos úteis.',
     author: 'Comunidade ConectaMaker', likes: 6, tags: ['Impressão 3D', 'Modelagem'], audience: 'Iniciantes',
     materials: ['Filamento PLA'], tools: ['Impressora 3D', 'TinkerCAD'],
     steps: ['Modele um disco no TinkerCAD.', 'Exporte o STL e fatie.', 'Imprima e finalize.'], createdAt: '2026-06-18',
   },
   {
-    id: 'porta-copos-reciclado', parentId: 'porta-copos', title: 'Porta-copos com material reciclado', category: 'Sustentabilidade', level: 'Iniciante', duration: '2 horas',
+    id: 'porta-copos-reciclado', cover: portaCoposRecicladoCover, parentId: 'porta-copos', title: 'Porta-copos com material reciclado', category: 'Sustentabilidade', level: 'Iniciante', duration: '2 horas',
     summary: 'Adaptação que substitui a impressão por materiais reaproveitados.',
     author: 'Marina Costa', likes: 3, tags: ['Reciclagem'], audience: 'Iniciantes',
     materials: ['Papelão', 'Tampinhas', 'Cola'], tools: ['Tesoura'],
@@ -91,7 +103,7 @@ export const projects = [
     steps: ['Recorte discos de papelão.', 'Cole em camadas.', 'Decore com tampinhas.'], createdAt: '2026-09-10',
   },
   {
-    id: 'porta-copos-tatil', parentId: 'porta-copos', title: 'Porta-copos com marcação tátil', category: 'Acessibilidade', level: 'Intermediário', duration: '4 horas',
+    id: 'porta-copos-tatil', cover: portaCoposTatilCover, parentId: 'porta-copos', title: 'Porta-copos com marcação tátil', category: 'Acessibilidade', level: 'Intermediário', duration: '4 horas',
     summary: 'Adaptação com referências em relevo para identificar a posição da peça.',
     author: 'Ana Souza', likes: 4, tags: ['Tátil', 'Inclusão'], audience: 'Pessoas com baixa visão',
     materials: ['Filamento PLA'], tools: ['Impressora 3D'],
@@ -99,7 +111,7 @@ export const projects = [
     steps: ['Abra o modelo original.', 'Adicione os pontos em relevo.', 'Imprima e valide com o público.'], createdAt: '2026-09-26',
   },
   {
-    id: 'luminaria', title: 'Luminária Cristo de Cornélio Procópio', category: 'Arte e Design', level: 'Intermediário', duration: 'A definir',
+    id: 'luminaria', cover: luminariaCover, title: 'Luminária Cristo de Cornélio Procópio', category: 'Arte e Design', level: 'Intermediário', duration: 'A definir',
     summary: 'Luminária com a silhueta do Cristo e identidade visual do Espaço Maker UENP, apresentada como protótipo de fabricação digital.',
     author: 'Espaço Maker UENP — Cornélio Procópio', likes: 0, tags: ['Corte a laser', 'Acrílico'], audience: 'Público geral',
     materials: ['Acrílico', 'LED'], tools: ['Cortadora a laser'],
