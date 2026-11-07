@@ -57,7 +57,7 @@ ul, ol { padding: 0; margin: 0; }
 .link-btn { all: unset; cursor: pointer; color: var(--brand); font-weight: 800; font-size: .85rem; text-decoration: underline; } .link-btn:focus-visible { outline: 3px solid #2f9fb0; }
 .scrim { display: none; }
 .main { width: 100%; min-width: 0; padding: 28px 40px 0; outline: none; }
-.page, .footer { width: min(100%, 1160px); margin-inline: auto; }
+.page, .footer { width: min(100%, 1400px); margin-inline: auto; }
 .page { animation: pageIn .45s var(--ease) both; }
 .page > * + * { margin-top: 1.1rem; } .page > h2 { margin-top: 2rem; }
 .footer { padding: 36px 0 28px; font-size: .85rem; color: var(--muted); }
