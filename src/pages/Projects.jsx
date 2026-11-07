@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft } from 'react-icons/lu'
+import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2 } from 'react-icons/lu'
 import AdaptationTree from '../components/AdaptationTree.jsx'
 import VariantModal from '../components/VariantModal.jsx'
 import { Chip, Cover, Notice, PageHeader, Avatar } from '../components/ui.jsx'
@@ -7,11 +7,31 @@ import { CATEGORIES, LEVELS } from '../data/seed.js'
 import { Link, useRouter } from '../router.jsx'
 import { useStore } from '../store.jsx'
 
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024
+const MAX_FILE_SIZE = 8 * 1024 * 1024
+const EMBED_HOSTS = ['tinkercad.com', 'youtube.com', 'youtu.be', 'sketchfab.com', 'vimeo.com']
+
+const readFile = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.onload = () => resolve({ name: file.name, type: file.type || 'application/octet-stream', size: file.size, data: reader.result })
+  reader.onerror = reject
+  reader.readAsDataURL(file)
+})
+
+const isAllowedEmbed = (value) => {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && EMBED_HOSTS.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`))
+  } catch { return false }
+}
+
+const formatSize = (size) => size < 1024 * 1024 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / 1024 / 1024).toFixed(1)} MB`
+
 export function ProjectCard({ p, parent }) {
   const { state } = useStore()
   return (
     <article className="card project-card">
-      <Link to={`/projetos/${p.id}`} className="card-cover-link" tabIndex={-1} aria-hidden="true"><Cover category={p.category} /></Link>
+      <Link to={`/projetos/${p.id}`} className="card-cover-link" tabIndex={-1} aria-hidden="true"><Cover category={p.category} image={p.cover} /></Link>
       <div className="card-body">
         <div className="tag-row"><Chip>{p.category}</Chip>{parent && <Chip tone="type" style={{ '--dot': '#17909c' }}><LuGitBranch /> Variante</Chip>}</div>
         <h3><Link to={`/projetos/${p.id}`}>{p.title}</Link></h3>
@@ -91,7 +111,7 @@ export function ProjectDetail({ id }) {
         <h1>{p.title}</h1>
         <p className="lead">{p.summary}</p>
         {parent && <p className="derived"><LuGitBranch /> Variante de <Link to={`/projetos/${parent.id}`}>{parent.title}</Link>{p.adaptation && <> — {p.adaptation.changed}</>}</p>}
-        <Cover category={p.category} className="detail-cover" />
+        <Cover category={p.category} image={p.cover} className="detail-cover" />
         <div className="tag-row">{p.tags?.map((t) => <Chip key={t}>{t}</Chip>)}</div>
         <dl className="info-grid">{info.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
@@ -109,8 +129,7 @@ export function ProjectDetail({ id }) {
           </Notice>
         )}
 
-        <h2>Etapas de execução</h2>
-        <ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol>
+        {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <><h2>Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></>}
 
         {p.files && (
           <>
@@ -138,20 +157,55 @@ export function ProjectDetail({ id }) {
   )
 }
 
+function ProjectTopics({ topics }) {
+  return <section className="project-topics" aria-label="Documentação do projeto">
+    <h2>Documentação do projeto</h2>
+    {topics.map((topic, i) => <article className="topic" key={topic.id || i}>
+      <h3>{topic.title || `Tópico ${i + 1}`}</h3>
+      {topic.description && <p className="muted">{topic.description}</p>}
+      {!!topic.embeds?.length && <div className="topic-embeds">{topic.embeds.map((embed) => <div className="embed-card" key={embed.url}>
+        <div className="between"><strong>{embed.title || embed.url}</strong><a href={embed.url} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">Abrir <LuExternalLink /></a></div>
+        {isAllowedEmbed(embed.url) && <iframe title={embed.title || 'Conteúdo incorporado'} src={embed.url} loading="lazy" allowFullScreen />}
+      </div>)}</div>}
+      {!!topic.files?.length && <div className="topic-files"><strong>Arquivos</strong><div className="actions">{topic.files.map((file) => <a className="btn btn-secondary btn-sm" key={file.name} href={file.data} download={file.name}>{file.name} <span className="muted small">{formatSize(file.size)}</span><LuDownload /></a>)}</div></div>}
+    </article>)}
+  </section>
+}
+
 export function NewProject() {
   const { addProject, projects, state, notify } = useStore()
   const { navigate } = useRouter()
-  const [f, setF] = useState({ title: '', description: '', category: 'Robótica', level: 'Iniciante', materials: '', tools: '', steps: '' })
+  const [f, setF] = useState({ title: '', description: '', category: 'Robótica', level: 'Iniciante', materials: '', tools: '', cover: '', topics: [{ id: 'topic-1', title: '', description: '', files: [], embeds: [], embedTitle: '', embedUrl: '' }] })
   const [err, setErr] = useState(false)
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const list = (s, sep) => s.split(sep).map((x) => x.trim()).filter(Boolean)
+  const updateTopic = (index, patch) => setF((current) => ({ ...current, topics: current.topics.map((topic, i) => i === index ? { ...topic, ...patch } : topic) }))
+  const addTopic = () => setF((current) => ({ ...current, topics: [...current.topics, { id: `topic-${Date.now()}`, title: '', description: '', files: [], embeds: [], embedTitle: '', embedUrl: '' }] }))
+  const removeTopic = (index) => setF((current) => ({ ...current, topics: current.topics.filter((_, i) => i !== index) }))
+  const uploadCover = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_SIZE) return notify('Escolha uma imagem JPG, PNG ou WebP de até 3 MB.')
+    readFile(file).then((result) => setF((current) => ({ ...current, cover: result.data })))
+  }
+  const uploadTopicFiles = (index, e) => {
+    const files = [...(e.target.files || [])]
+    if (files.some((file) => file.size > MAX_FILE_SIZE)) return notify('Cada arquivo pode ter no máximo 8 MB.')
+    Promise.all(files.map(readFile)).then((results) => updateTopic(index, { files: [...f.topics[index].files, ...results] }))
+  }
+  const addEmbed = (index) => {
+    const topic = f.topics[index]
+    if (!topic.embedUrl.trim() || !isAllowedEmbed(topic.embedUrl.trim())) return notify('Use uma URL HTTPS de Tinkercad, YouTube, Sketchfab ou Vimeo.')
+    updateTopic(index, { embeds: [...topic.embeds, { title: topic.embedTitle.trim(), url: topic.embedUrl.trim() }], embedTitle: '', embedUrl: '' })
+  }
 
   const submit = (e) => {
     e.preventDefault()
     if (f.title.trim().length < 3 || f.description.trim().length < 10) return setErr(true)
     let id = f.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'projeto'
     while (projects.some((p) => p.id === id)) id += '-2'
-    addProject({ id, title: f.title.trim(), category: f.category, level: f.level, duration: 'A definir', summary: f.description.trim(), author: state.user, likes: 0, tags: [f.category], audience: 'Comunidade', materials: list(f.materials, ','), tools: list(f.tools, ','), steps: list(f.steps, '\n'), createdAt: new Date().toISOString().slice(0, 10) })
+    const topics = f.topics.map(({ embedTitle, embedUrl, ...topic }) => topic).filter((topic) => topic.title.trim() || topic.description.trim() || topic.files.length || topic.embeds.length)
+    addProject({ id, title: f.title.trim(), category: f.category, level: f.level, duration: 'A definir', summary: f.description.trim(), author: state.user, likes: 0, tags: [f.category], audience: 'Comunidade', materials: list(f.materials, ','), tools: list(f.tools, ','), topics, steps: [], cover: f.cover, createdAt: new Date().toISOString().slice(0, 10) })
     notify('Projeto publicado neste navegador.')
     navigate(`/projetos/${id}`)
   }
@@ -167,9 +221,24 @@ export function NewProject() {
           <div><label htmlFor="c">Categoria</label><select id="c" value={f.category} onChange={set('category')}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></div>
           <div><label htmlFor="l">Dificuldade</label><select id="l" value={f.level} onChange={set('level')}>{LEVELS.map((c) => <option key={c}>{c}</option>)}</select></div>
         </div>
-        <label htmlFor="m">Materiais (separados por vírgula)</label><input id="m" value={f.materials} onChange={set('materials')} />
-        <label htmlFor="f">Ferramentas (separadas por vírgula)</label><input id="f" value={f.tools} onChange={set('tools')} />
-        <label htmlFor="s">Etapas (uma por linha)</label><textarea id="s" rows={4} value={f.steps} onChange={set('steps')} />
+        <label htmlFor="cover">Imagem de capa</label>
+        <input id="cover" type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadCover} />
+        <p className="muted small">JPG, PNG ou WebP · até 3 MB. A imagem fica salva neste navegador no MVP.</p>
+        {f.cover && <img className="cover-preview" src={f.cover} alt="Prévia da capa do projeto" />}
+        <div className="between topic-heading"><h2>Tópicos do projeto</h2><button type="button" className="btn btn-secondary btn-sm" onClick={addTopic}><LuPlus /> Adicionar tópico</button></div>
+        <p className="muted">Organize corte a laser, modelagem no Tinkercad, montagem e outros conteúdos em tópicos separados.</p>
+        {f.topics.map((topic, index) => <fieldset className="topic-editor" key={topic.id}>
+          <div className="between"><legend>Tópico {index + 1}</legend>{f.topics.length > 1 && <button type="button" className="icon-btn" onClick={() => removeTopic(index)} aria-label={`Remover tópico ${index + 1}`}><LuTrash2 /></button>}</div>
+          <label htmlFor={`topic-title-${topic.id}`}>Título</label><input id={`topic-title-${topic.id}`} value={topic.title} onChange={(e) => updateTopic(index, { title: e.target.value })} placeholder="Ex.: Corte a laser" />
+          <label htmlFor={`topic-description-${topic.id}`}>Descrição</label><textarea id={`topic-description-${topic.id}`} rows={3} value={topic.description} onChange={(e) => updateTopic(index, { description: e.target.value })} placeholder="Explique esta parte do projeto." />
+          <label htmlFor={`topic-files-${topic.id}`}>Arquivos (STL, SVG, PDF, imagens...)</label><input id={`topic-files-${topic.id}`} type="file" multiple onChange={(e) => uploadTopicFiles(index, e)} />
+          {topic.files.length > 0 && <ul className="file-list">{topic.files.map((file) => <li key={file.name}>{file.name} <span>{formatSize(file.size)}</span></li>)}</ul>}
+          <label htmlFor={`topic-embed-title-${topic.id}`}>Título do conteúdo incorporado</label><input id={`topic-embed-title-${topic.id}`} value={topic.embedTitle} onChange={(e) => updateTopic(index, { embedTitle: e.target.value })} placeholder="Ex.: Modelo 3D no Tinkercad" />
+          <label htmlFor={`topic-embed-url-${topic.id}`}>URL para incorporar</label>
+          <div className="embed-input"><input id={`topic-embed-url-${topic.id}`} type="url" value={topic.embedUrl} onChange={(e) => updateTopic(index, { embedUrl: e.target.value })} placeholder="https://www.tinkercad.com/..." /><button type="button" className="btn btn-secondary btn-sm" onClick={() => addEmbed(index)}>Adicionar <LuExternalLink /></button></div>
+          <p className="muted small">Embeds disponíveis: Tinkercad, YouTube, Sketchfab e Vimeo. Outras URLs podem ser adicionadas como links em uma próxima etapa.</p>
+          {topic.embeds.length > 0 && <ul className="file-list">{topic.embeds.map((embed) => <li key={embed.url}>{embed.title || embed.url}</li>)}</ul>}
+        </fieldset>)}
         <div><button className="btn btn-primary" type="submit">Publicar projeto</button></div>
       </form>
     </>

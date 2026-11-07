@@ -15,13 +15,12 @@ const CATEGORY_STYLE = {
 export const ICONS = { cut: LuScissors, chip: LuCpu, cube: LuBox, access: LuAccessibility, code: LuCode, idea: LuLightbulb, robot: LuBot }
 
 /** Capa ilustrativa (o MVP não tem fotos reais): gradiente + ícone da categoria. */
-export function Cover({ category, icon, shape = 'rect', className = '' }) {
+export function Cover({ category, icon, image, shape = 'rect', className = '' }) {
   const s = CATEGORY_STYLE[category] || CATEGORY_STYLE.Educação
   const Icon = icon || s.icon
   return (
     <div className={`cover cover-${shape} ${className}`} style={{ '--c1': s.from, '--c2': s.to }} aria-hidden="true">
-      <i className="cover-dots" />
-      <Icon className="cover-icon" />
+      {image ? <img className="cover-image" src={image} alt="" /> : <><i className="cover-dots" /><Icon className="cover-icon" /></>}
     </div>
   )
 }
