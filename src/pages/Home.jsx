@@ -11,14 +11,14 @@ const Head = ({ title, to, label }) => <div className="section-head tight"><h2>{
 
 export default function Home() {
   const { projects } = useStore()
+  const bannerImage = `${import.meta.env.BASE_URL}images/trilha-cultura-maker.png`
   return (
     <>
-      <section className="hero">
-        <div className="hero-glow" aria-hidden="true" />
+      <section className="hero" style={{ '--hero-photo': `url("${bannerImage}")` }}>
         <p className="eyebrow light">Cultura maker para a educação</p>
         <h1>O que você quer aprender, criar ou resolver hoje?</h1>
         <p>Conectamos pessoas, conhecimento e espaços maker para transformar necessidades reais em aprendizagem e soluções abertas.</p>
-        <div className="actions"><Link to="/projetos" className="btn btn-amber">Explorar projetos</Link><Link to="/cursos" className="btn btn-ghost-light">Explorar cursos</Link></div>
+        <div className="actions"><Link to="/projetos" className="btn btn-amber">Explorar projetos</Link><Link to="/sobre" className="btn btn-ghost-light">Conheça o ConectaMaker em 1 minuto</Link></div>
       </section>
 
       <h2>Comece por aqui</h2>
