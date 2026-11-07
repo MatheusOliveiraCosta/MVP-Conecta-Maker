@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { LuArrowRight, LuBookOpen, LuHeart, LuLayoutGrid, LuNetwork } from 'react-icons/lu'
 import { needs, courses, spaces, trails } from '../data/seed.js'
 import { Link } from '../router.jsx'
@@ -7,14 +8,29 @@ import { ProjectCard } from './Projects.jsx'
 import { TrailCard } from './Learn.jsx'
 import { SpaceCard } from './Community.jsx'
 
+const bannerPhotos = [
+  `${import.meta.env.BASE_URL}images/trilha-cultura-maker.png`,
+  `${import.meta.env.BASE_URL}images/projeto-horta-automatizada.png`,
+  `${import.meta.env.BASE_URL}images/projeto-semaforo-arduino.png`,
+]
+
 const Head = ({ title, to, label }) => <div className="section-head tight"><h2>{title}</h2><Link to={to} className="btn btn-secondary btn-sm">{label} <LuArrowRight /></Link></div>
 
 export default function Home() {
   const { projects } = useStore()
-  const bannerImage = `${import.meta.env.BASE_URL}images/trilha-cultura-maker.png`
+  const [activeBanner, setActiveBanner] = useState(0)
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
+    const interval = window.setInterval(() => setActiveBanner((active) => (active + 1) % bannerPhotos.length), 6500)
+    return () => window.clearInterval(interval)
+  }, [])
+
   return (
     <>
-      <section className="hero" style={{ '--hero-photo': `url("${bannerImage}")` }}>
+      <section className="hero">
+        <div className="hero-photos" aria-hidden="true">
+          {bannerPhotos.map((photo, index) => <img key={photo} className={`hero-photo ${activeBanner === index ? 'is-active' : ''}`} src={photo} alt="" />)}
+        </div>
         <p className="eyebrow light">Cultura maker para a educação</p>
         <h1>O que você quer aprender, criar ou resolver hoje?</h1>
         <p>Conectamos pessoas, conhecimento e espaços maker para transformar necessidades reais em aprendizagem e soluções abertas.</p>
