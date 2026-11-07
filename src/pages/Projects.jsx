@@ -370,9 +370,13 @@ export function ProjectDetail({ id }) {
         <div className="tag-row">{p.tags?.map((t) => <Chip key={t}>{t}</Chip>)}</div>
         <dl className="info-grid">{info.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
+        <section className="manufacturing-spotlight" aria-labelledby="manufacturing-spotlight-title">
+          <div><p className="eyebrow">Do projeto à prática</p><h2 id="manufacturing-spotlight-title">Precisa fabricar?</h2><p>Encontre espaços maker, serviços de impressão 3D e fornecedores de materiais para colocar este projeto em prática.</p></div>
+          <button className={`btn btn-amber manufacturing-spotlight-button ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Ver fornecedores e serviços'}</button>
+        </section>
+
         <div className="actions">
           <button className={`btn btn-secondary ${saved ? 'is-on' : ''}`} onClick={() => { toggleSaved(p.id); notify(saved ? 'Projeto removido dos salvos.' : 'Projeto salvo!') }} aria-pressed={saved}><LuHeart /> {saved ? 'Projeto salvo' : 'Salvar projeto'}</button>
-          <button className={`btn btn-amber manufacturing-cta ${showManufacturing ? 'is-on' : ''}`} onClick={() => setShowManufacturing((visible) => !visible)} aria-expanded={showManufacturing} aria-controls="manufacturing-guide"><LuPrinter /> {showManufacturing ? 'Ocultar fornecedores' : 'Precisa fabricar? Ver fornecedores'}</button>
           <button className="btn btn-secondary" onClick={() => notify('Registramos seu interesse em aprender a fazer.')}>Quero aprender a fazer</button>
           <button className="btn btn-secondary" onClick={() => navigate('/colaborar')}>Tenho uma necessidade parecida</button>
           <button className="btn btn-secondary" onClick={() => setVariantFor(p)}><LuGitBranch /> Criar remix</button>
