@@ -18,14 +18,8 @@ export default function Home() {
         <p className="eyebrow light">Cultura maker para a educação</p>
         <h1>O que você quer aprender, criar ou resolver hoje?</h1>
         <p>Conectamos pessoas, conhecimento e espaços maker para transformar necessidades reais em aprendizagem e soluções abertas.</p>
-        <div className="actions"><Link to="/projetos" className="btn btn-amber">Explorar projetos</Link><Link to="/aprender" className="btn btn-ghost-light">Conheça o ConectaMaker em 1 minuto</Link></div>
+        <div className="actions"><Link to="/projetos" className="btn btn-amber">Explorar projetos</Link><Link to="/cursos" className="btn btn-ghost-light">Explorar cursos</Link></div>
       </section>
-
-      <div className="grid grid-3 about">
-        {[['Por que existimos', 'O ConectaMaker nasceu para democratizar o acesso à cultura maker: conectar pessoas, conhecimento, projetos e espaços para que qualquer pessoa, onde estiver e com os recursos que tiver, possa aprender, criar e resolver necessidades reais.'],
-          ['Como funciona', 'Projetos abertos, trilhas, competências, mentores e laboratórios se encontram em uma só plataforma. Não é marketplace: quem traz uma necessidade participa da solução; quem compartilha conhecimento também aprende.'],
-          ['Nossa missão', 'Conectar pessoas e espaços maker para transformar conhecimento em oportunidade e necessidades em projetos colaborativos de impacto social.']].map(([t, d]) => <article className="card pad" key={t}><h3>{t}</h3><p className="muted">{d}</p></article>)}
-      </div>
 
       <h2>Comece por aqui</h2>
       <div className="grid grid-2 start">

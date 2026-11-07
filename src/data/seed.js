@@ -139,8 +139,16 @@ export const spaces = [
 
 // Pessoas por cidade (para o mapa da Rede Maker)
 export const peopleByCity = { 'Cornélio Procópio': 1, Curitiba: 1, Londrina: 1 }
-// Posições aproximadas no mapa (0–100)
-export const cityPos = { 'Belo Horizonte': [67, 55], 'Cornélio Procópio': [52, 64], Curitiba: [57, 73], Jacarezinho: [53, 66], Londrina: [50, 62], 'São Paulo': [60, 66] }
+// Posições ajustadas à projeção do SVG do Brasil (viewBox 0–100).
+// Referência aproximada: longitude/latitude reais de cada cidade.
+export const cityPos = {
+  'Belo Horizonte': [75.6, 64.0],
+  'Cornélio Procópio': [59.5, 71.9],
+  Curitiba: [62.8, 77.1],
+  Jacarezinho: [61.1, 72.3],
+  Londrina: [58.3, 72.3],
+  'São Paulo': [69.1, 72.6],
+}
 
 export const courses = [
   { id: 'arduino-curso', title: 'Primeiros passos com Arduino', summary: 'Conheça a placa, programe saídas digitais e experimente um circuito simples.', space: 'Espaço Maker UENP — exemplo demonstrativo', spaceId: 'uenp', mode: 'Presencial', level: 'Iniciante', icon: 'chip',

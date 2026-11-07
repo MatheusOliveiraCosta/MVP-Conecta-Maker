@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LuBookOpen, LuFileText, LuHeart, LuHouse, LuLayoutGrid, LuMenu, LuNetwork, LuSearch, LuWrench, LuX } from 'react-icons/lu'
+import { LuBookOpen, LuFileText, LuHeart, LuHouse, LuInfo, LuLayoutGrid, LuMenu, LuNetwork, LuSearch, LuWrench, LuX } from 'react-icons/lu'
 import { Link, useRouter } from '../router.jsx'
 import { useStore } from '../store.jsx'
 import { Avatar } from './ui.jsx'
@@ -12,6 +12,7 @@ const NAV = [
   { to: '/colaborar', label: 'Colaborar', icon: LuHeart },
   { to: '/rede', label: 'Rede Maker', icon: LuNetwork },
   { to: '/ferramentas', label: 'Ferramentas', icon: LuWrench },
+  { to: '/sobre', label: 'Sobre', icon: LuInfo },
 ]
 
 export function Logo() {
