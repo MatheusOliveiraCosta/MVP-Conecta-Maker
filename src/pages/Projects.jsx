@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2 } from 'react-icons/lu'
 import AdaptationTree from '../components/AdaptationTree.jsx'
@@ -56,6 +54,9 @@ function SoftwareStlPreview({ url, title }) {
     let frame
     const controller = new AbortController()
     const loader = new STLLoader()
+    const isWeakDevice = (navigator.hardwareConcurrency || 4) <= 2 || (navigator.deviceMemory || 4) <= 2
+    const maxTriangles = isWeakDevice ? 1600 : 4200
+    const size = { width: 0, height: 0, dpr: 0 }
 
     const draw = () => {
       if (disposed || !modelRef.current) return
@@ -63,9 +64,14 @@ function SoftwareStlPreview({ url, title }) {
       const { yaw, pitch, zoom } = viewRef.current
       const width = canvas.clientWidth || 280
       const height = canvas.clientHeight || 260
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = Math.round(width * dpr)
-      canvas.height = Math.round(height * dpr)
+      const dpr = isWeakDevice ? 1 : Math.min(window.devicePixelRatio || 1, 1.35)
+      if (size.width !== width || size.height !== height || size.dpr !== dpr) {
+        size.width = width
+        size.height = height
+        size.dpr = dpr
+        canvas.width = Math.round(width * dpr)
+        canvas.height = Math.round(height * dpr)
+      }
       context.setTransform(dpr, 0, 0, dpr, 0, 0)
       context.fillStyle = '#edf5f6'
       context.fillRect(0, 0, width, height)
@@ -79,12 +85,23 @@ function SoftwareStlPreview({ url, title }) {
         const depth = y * sinX + rotatedZ * cosX + 4
         return [width / 2 + rotatedX * scale / depth, height / 2 - rotatedY * scale / depth, depth]
       }
-      const projected = triangles.map((triangle) => triangle.map(project))
-      projected.sort((a, b) => (a[0][2] + a[1][2] + a[2][2]) - (b[0][2] + b[1][2] + b[2][2]))
+      const projected = new Array(triangles.length)
+      for (let index = 0; index < triangles.length; index += 1) {
+        const points = triangles[index].map(project)
+        projected[index] = { points, depth: points[0][2] + points[1][2] + points[2][2] }
+      }
+      projected.sort((a, b) => a.depth - b.depth)
+      context.save()
+      context.globalAlpha = .18
+      context.fillStyle = '#317f88'
+      context.beginPath()
+      context.ellipse(width / 2, height * .78, scale * .48, scale * .1, 0, 0, Math.PI * 2)
+      context.fill()
+      context.restore()
       for (const triangle of projected) {
-        const [a, b, c] = triangle
+        const [a, b, c] = triangle.points
         const cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
-        const light = Math.max(.35, Math.min(1, .55 + Math.abs(cross) / (scale * scale * .08)))
+        const light = Math.max(.38, Math.min(1, .48 + Math.abs(cross) / (scale * scale * .1)))
         context.beginPath()
         context.moveTo(a[0], a[1])
         context.lineTo(b[0], b[1])
@@ -92,14 +109,20 @@ function SoftwareStlPreview({ url, title }) {
         context.closePath()
         context.fillStyle = `rgb(${Math.round(49 * light)}, ${Math.round(137 * light)}, ${Math.round(149 * light)})`
         context.fill()
+        if (!isWeakDevice) {
+          context.strokeStyle = 'rgba(20, 86, 94, .16)'
+          context.lineWidth = .35
+          context.stroke()
+        }
       }
     }
     const scheduleDraw = () => {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(draw)
     }
-    const resizeObserver = new ResizeObserver(scheduleDraw)
-    resizeObserver.observe(canvas)
+    const resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleDraw) : null
+    resizeObserver?.observe(canvas)
+    if (!resizeObserver) window.addEventListener('resize', scheduleDraw)
     const onPointerDown = (event) => {
       canvas.setPointerCapture(event.pointerId)
       canvas.dataset.dragX = event.clientX
@@ -135,8 +158,11 @@ function SoftwareStlPreview({ url, title }) {
         geometry.computeBoundingSphere()
         geometry.scale(1.35 / (geometry.boundingSphere?.radius || 1), 1.35 / (geometry.boundingSphere?.radius || 1), 1.35 / (geometry.boundingSphere?.radius || 1))
         const positions = geometry.getAttribute('position').array
+        const triangleCount = Math.floor(positions.length / 9)
+        const step = Math.max(1, Math.ceil(triangleCount / maxTriangles))
         const triangles = []
-        for (let index = 0; index < positions.length; index += 9) {
+        for (let triangleIndex = 0; triangleIndex < triangleCount; triangleIndex += step) {
+          const index = triangleIndex * 9
           triangles.push([
             [positions[index], positions[index + 1], positions[index + 2]],
             [positions[index + 3], positions[index + 4], positions[index + 5]],
@@ -157,7 +183,8 @@ function SoftwareStlPreview({ url, title }) {
       disposed = true
       controller.abort()
       cancelAnimationFrame(frame)
-      resizeObserver.disconnect()
+      resizeObserver?.disconnect()
+      if (!resizeObserver) window.removeEventListener('resize', scheduleDraw)
       canvas.removeEventListener('pointerdown', onPointerDown)
       canvas.removeEventListener('pointermove', onPointerMove)
       canvas.removeEventListener('wheel', onWheel)
@@ -170,141 +197,6 @@ function SoftwareStlPreview({ url, title }) {
   </div>
 }
 
-function WebglStlPreview({ url, title }) {
-  const mountRef = useRef(null)
-  const [status, setStatus] = useState('loading')
-  useEffect(() => {
-    const container = mountRef.current
-    if (!container) return undefined
-    let disposed = false
-    let active = false
-    let frame
-    let resizeObserver
-    let visibilityObserver
-    let mesh
-    let renderer
-    let controls
-    const requestController = new AbortController()
-    setStatus('loading')
-
-    const fail = () => {
-      if (!disposed) setStatus('error')
-    }
-    const requestTimeout = setTimeout(() => {
-      requestController.abort()
-      setStatus('software')
-    }, 15000)
-
-    const render = () => {
-      if (disposed) return
-      if (!active) {
-        frame = undefined
-        return
-      }
-      controls?.update()
-      renderer?.render(scene, camera)
-      frame = requestAnimationFrame(render)
-    }
-
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100)
-    try {
-      const probe = document.createElement('canvas')
-      const webgl = probe.getContext('webgl') || probe.getContext('experimental-webgl')
-      if (!webgl) throw new Error('WebGL indisponível')
-      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' })
-    } catch {
-      fail()
-      return () => {
-        disposed = true
-        clearTimeout(requestTimeout)
-        requestController.abort()
-      }
-    }
-    scene.background = new THREE.Color('#edf5f6')
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
-    renderer.outputColorSpace = THREE.SRGBColorSpace
-    container.replaceChildren(renderer.domElement)
-    controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
-    controls.dampingFactor = .08
-    controls.enablePan = true
-    controls.minDistance = .6
-    controls.maxDistance = 8
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x7aaeb5, 2.2))
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5)
-    keyLight.position.set(2, 3, 4)
-    scene.add(keyLight)
-    const fillLight = new THREE.DirectionalLight(0x8bd3d1, 1.2)
-    fillLight.position.set(-3, 1, -2)
-    scene.add(fillLight)
-    const resize = () => {
-      const width = Math.max(container.clientWidth, 280)
-      const height = Math.max(container.clientHeight, 260)
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderer.setSize(width, height, false)
-    }
-    resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(container)
-    resize()
-    visibilityObserver = new IntersectionObserver(([entry]) => {
-      active = entry.isIntersecting
-      if (active && !frame) render()
-    }, { rootMargin: '160px' })
-    visibilityObserver.observe(container)
-    const loader = new STLLoader()
-    const loadModel = async () => {
-      try {
-        const response = await fetch(resolveAssetUrl(url), { signal: requestController.signal, cache: 'no-cache' })
-        if (!response.ok) throw new Error(`STL indisponível (${response.status})`)
-        const geometry = loader.parse(await response.arrayBuffer())
-        if (disposed) {
-          geometry.dispose()
-          return
-        }
-        geometry.computeVertexNormals()
-        geometry.center()
-        geometry.computeBoundingSphere()
-        const radius = geometry.boundingSphere?.radius || 1
-        geometry.scale(1.35 / radius, 1.35 / radius, 1.35 / radius)
-        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x318995, roughness: .62, metalness: .08, side: THREE.DoubleSide }))
-        scene.add(mesh)
-        const distance = 3.2
-        camera.position.set(distance, distance * .72, distance * 1.12)
-        controls.target.set(0, 0, 0)
-        controls.update()
-        setStatus('ready')
-        if (active && !frame) render()
-      } catch (error) {
-        if (!disposed && error.name !== 'AbortError') fail()
-      } finally {
-        clearTimeout(requestTimeout)
-      }
-    }
-    loadModel()
-    return () => {
-      disposed = true
-      requestController.abort()
-      cancelAnimationFrame(frame)
-      resizeObserver?.disconnect()
-      visibilityObserver?.disconnect()
-      controls.dispose()
-      renderer.dispose()
-      mesh?.geometry.dispose()
-      mesh?.material.dispose()
-      container.replaceChildren()
-    }
-  }, [url])
-  if (status === 'software') return <SoftwareStlPreview url={url} title={title} />
-  return <div className="stl-viewer">
-    {status === 'error' ? <div className="stl-fallback" role="img" aria-label={`Prévia 3D indisponível de ${title}`}><span aria-hidden="true">◇</span><p>Prévia 3D indisponível neste dispositivo.</p><small>Use o botão “Baixar” para abrir o STL em um fatiador.</small></div> : <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />}
-    {status === 'ready' && <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
-  </div>
-}
-
-// O preview usa o renderizador por CPU como caminho único. Isso evita que
-// diferenças de GPU, drivers ou políticas do navegador deixem o canvas vazio.
 function StlPreview({ url, title }) {
   return <SoftwareStlPreview url={url} title={title} />
 }
