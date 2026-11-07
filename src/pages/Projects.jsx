@@ -14,6 +14,14 @@ const MAX_IMAGE_SIZE = 3 * 1024 * 1024
 const MAX_FILE_SIZE = 8 * 1024 * 1024
 const EMBED_HOSTS = ['tinkercad.com', 'youtube.com', 'youtu.be', 'sketchfab.com', 'vimeo.com']
 
+// Arquivos em `public/` precisam acompanhar a base definida pelo Vite.
+// Usar o caminho absoluto original (`/arquivos/...`) quebra quando o build é
+// servido em um subcaminho, algo comum em deploys estáticos e previews.
+const resolveAssetUrl = (value) => {
+  if (!value || /^(?:https?:|data:|blob:)/i.test(value)) return value
+  return `${import.meta.env.BASE_URL}${value.replace(/^\/+/, '')}`
+}
+
 const readFile = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader()
   reader.onload = () => resolve({ name: file.name, type: file.type || 'application/octet-stream', size: file.size, data: reader.result })
@@ -105,7 +113,7 @@ function StlPreview({ url, title }) {
     }, { rootMargin: '160px' })
     visibilityObserver.observe(container)
     const loader = new STLLoader()
-    loader.load(new URL(url, document.baseURI).href, (geometry) => {
+    loader.load(resolveAssetUrl(url), (geometry) => {
       if (disposed) {
         geometry.dispose()
         return
@@ -151,12 +159,12 @@ function ProjectResources({ resources = [] }) {
         <div className="resource-head">
           <div><h3>{resource.title}</h3>{resource.description && <p className="muted">{resource.description}</p>}</div>
           <div className="actions">
-            {resource.download && <a className="btn btn-secondary btn-sm" href={resource.url} download={resource.download}><LuDownload /> Baixar</a>}
-            {resource.externalUrl && <a className="btn btn-secondary btn-sm" href={resource.externalUrl} target="_blank" rel="noreferrer"><LuExternalLink /> {resource.externalLabel || 'Abrir'}</a>}
-            {!resource.download && !resource.externalUrl && resource.type === 'link' && <a className="btn btn-secondary btn-sm" href={resource.url} target="_blank" rel="noreferrer"><LuExternalLink /> Abrir</a>}
+            {resource.download && <a className="btn btn-secondary btn-sm" href={resolveAssetUrl(resource.url)} download={resource.download}><LuDownload /> Baixar</a>}
+            {resource.externalUrl && <a className="btn btn-secondary btn-sm" href={resolveAssetUrl(resource.externalUrl)} target="_blank" rel="noreferrer"><LuExternalLink /> {resource.externalLabel || 'Abrir'}</a>}
+            {!resource.download && !resource.externalUrl && resource.type === 'link' && <a className="btn btn-secondary btn-sm" href={resolveAssetUrl(resource.url)} target="_blank" rel="noreferrer"><LuExternalLink /> Abrir</a>}
           </div>
         </div>
-        {(resource.type === 'svg' || resource.type === 'image') && <a href={resource.previewUrl || resource.url} target="_blank" rel="noreferrer"><img className="resource-image" src={resource.previewUrl || resource.url} alt={resource.alt || resource.title} loading="lazy" /></a>}
+        {(resource.type === 'svg' || resource.type === 'image') && <a href={resolveAssetUrl(resource.previewUrl || resource.url)} target="_blank" rel="noreferrer"><img className="resource-image" src={resolveAssetUrl(resource.previewUrl || resource.url)} alt={resource.alt || resource.title} loading="lazy" /></a>}
         {resource.type === 'stl' && <StlPreview url={resource.url} title={resource.title} />}
         {resource.type === 'embed' && <iframe className="resource-embed" title={resource.title} src={resource.url} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />}
       </article>)}
