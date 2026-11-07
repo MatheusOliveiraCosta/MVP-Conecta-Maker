@@ -74,7 +74,7 @@ export function Courses() {
       <div className="grid grid-2 stagger">
         {courses.map((c, i) => (
           <article className="card" key={c.id} style={{ '--i': i }}>
-            <Cover category={trailCategory[c.icon]} icon={ICONS[c.icon]} />
+            <Cover category={trailCategory[c.icon]} icon={ICONS[c.icon]} image={c.cover} />
             <div className="card-body">
               <p className="eyebrow">Gratuito · {c.mode}</p>
               <h3><Link to={`/cursos/${c.id}`}>{c.title}</Link></h3>
@@ -100,7 +100,7 @@ export function CourseDetail({ id }) {
       <article className="panel detail">
         <p className="eyebrow">Curso gratuito · {c.mode} · {c.level}</p>
         <h1>{c.title}</h1><p className="lead">{c.summary}</p>
-        <Cover category={trailCategory[c.icon]} icon={ICONS[c.icon]} className="detail-cover" />
+        <Cover category={trailCategory[c.icon]} icon={ICONS[c.icon]} image={c.cover} className="detail-cover" />
         <Notice title="Curso demonstrativo; agenda a confirmar">Esta página ilustra uma oferta de curso. Consulte a instituição para confirmar abertura, datas, vagas e forma de inscrição.</Notice>
         <h2>O que você vai aprender</h2>
         <ol className="steps">{c.learn.map((l) => <li key={l}>{l}</li>)}</ol>

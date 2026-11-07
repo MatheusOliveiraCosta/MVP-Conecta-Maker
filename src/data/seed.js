@@ -22,6 +22,9 @@ import trilhaCulturaMakerCover from '../../cultura-maker-sala-de-aula.png'
 import trilhaArduinoCover from '../../semaforo-arduino (1).png'
 import trilhaModelagemCover from '../../porta-copos-impresso-3d (1).png'
 import trilhaAcessibilidadeCover from '../../rotina-analogica (1).png'
+import cursoScratchCover from '../../curso-scratch-criativo.png'
+import cursoModelagemCover from '../../curso-fundamentos-modelagem-3d.png'
+import cursoRoboticaCover from '../../seguidor-de-linha.png'
 export const CATEGORIES = ['Acessibilidade', 'Eletrônica', 'Matemática', 'Sustentabilidade', 'Robótica', 'Programação', 'Arte e Design', 'Educação']
 export const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
 
@@ -182,13 +185,13 @@ export const cityPos = {
 }
 
 export const courses = [
-  { id: 'arduino-curso', title: 'Primeiros passos com Arduino', summary: 'Conheça a placa, programe saídas digitais e experimente um circuito simples.', space: 'Espaço Maker UENP — exemplo demonstrativo', spaceId: 'uenp', mode: 'Presencial', level: 'Iniciante', icon: 'chip',
+  { id: 'arduino-curso', title: 'Primeiros passos com Arduino', summary: 'Conheça a placa, programe saídas digitais e experimente um circuito simples.', space: 'Espaço Maker UENP — exemplo demonstrativo', spaceId: 'uenp', mode: 'Presencial', level: 'Iniciante', icon: 'chip', cover: semaforoCover,
     learn: ['Placa e componentes', 'Entradas e saídas', 'Semáforo com LEDs'], trailId: 'arduino' },
-  { id: 'scratch-curso', title: 'Programação criativa com Scratch', summary: 'Crie pequenas histórias e jogos para aprender lógica de programação.', space: 'Laboratório Escola Horizonte (fictício)', spaceId: 'horizonte', mode: 'Presencial', level: 'Iniciante', icon: 'code',
+  { id: 'scratch-curso', title: 'Programação criativa com Scratch', summary: 'Crie pequenas histórias e jogos para aprender lógica de programação.', space: 'Laboratório Escola Horizonte (fictício)', spaceId: 'horizonte', mode: 'Presencial', level: 'Iniciante', icon: 'code', cover: cursoScratchCover,
     learn: ['Blocos e sequências', 'Personagens e eventos', 'Um jogo simples'], trailId: 'programacao' },
-  { id: '3d-curso', title: 'Fundamentos em modelagem e impressão 3D', summary: 'Modele uma peça simples e prepare o arquivo para fabricação.', space: 'Fab Lab Vale Criativo (fictício)', spaceId: 'fablab', mode: 'Presencial', level: 'Iniciante', icon: 'cube',
+  { id: '3d-curso', title: 'Fundamentos em modelagem e impressão 3D', summary: 'Modele uma peça simples e prepare o arquivo para fabricação.', space: 'Fab Lab Vale Criativo (fictício)', spaceId: 'fablab', mode: 'Presencial', level: 'Iniciante', icon: 'cube', cover: cursoModelagemCover,
     learn: ['Formas básicas', 'Medidas e tolerâncias', 'Exportar e fatiar'], trailId: 'modelagem' },
-  { id: 'robotica-curso', title: 'Robótica para projetos escolares', summary: 'Experimente componentes eletrônicos em desafios práticos de robótica.', space: 'Núcleo Maker Campus Norte (fictício)', spaceId: 'norte', mode: 'Presencial', level: 'Iniciante', icon: 'robot',
+  { id: 'robotica-curso', title: 'Robótica para projetos escolares', summary: 'Experimente componentes eletrônicos em desafios práticos de robótica.', space: 'Núcleo Maker Campus Norte (fictício)', spaceId: 'norte', mode: 'Presencial', level: 'Iniciante', icon: 'robot', cover: cursoRoboticaCover,
     learn: ['Motores e sensores', 'Montar o chassi', 'Desafio de percurso'], trailId: 'eletronica' },
 ]
 
