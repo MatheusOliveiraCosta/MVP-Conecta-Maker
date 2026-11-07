@@ -170,7 +170,7 @@ function SoftwareStlPreview({ url, title }) {
   </div>
 }
 
-function StlPreview({ url, title }) {
+function WebglStlPreview({ url, title }) {
   const mountRef = useRef(null)
   const [status, setStatus] = useState('loading')
   useEffect(() => {
@@ -301,6 +301,12 @@ function StlPreview({ url, title }) {
     {status === 'error' ? <div className="stl-fallback" role="img" aria-label={`Prévia 3D indisponível de ${title}`}><span aria-hidden="true">◇</span><p>Prévia 3D indisponível neste dispositivo.</p><small>Use o botão “Baixar” para abrir o STL em um fatiador.</small></div> : <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />}
     {status === 'ready' && <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
   </div>
+}
+
+// O preview usa o renderizador por CPU como caminho único. Isso evita que
+// diferenças de GPU, drivers ou políticas do navegador deixem o canvas vazio.
+function StlPreview({ url, title }) {
+  return <SoftwareStlPreview url={url} title={title} />
 }
 
 function ProjectResources({ resources = [] }) {
