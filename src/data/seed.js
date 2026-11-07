@@ -46,7 +46,11 @@ export const projects = [
     author: 'Espaço Maker UENP', likes: 12, tags: ['TEA', 'Rotina', 'Educação inclusiva'], audience: 'Professores',
     materials: ['MDF', 'Marcadores coloridos', 'Peças móveis'], tools: ['Máquina de corte', 'Inkscape'],
     steps: ['Desenhe a sequência de tarefas com ícones simples.', 'Corte o painel e as peças em MDF.', 'Monte os indicadores móveis e teste a leitura com o público.'],
-    files: { svg: 'Baixar arquivo de corte SVG', stl: ['Baixar pino do slider · STL', 'Baixar metade do slider · STL'] },
+    resources: [
+      { type: 'svg', title: 'Arquivo de corte do quadro analógico', description: 'Desenho vetorial com painel, laterais, números, meses e ícones das tarefas.', url: '/arquivos/projetos/rotina-analogica/quadro-tarefas-analogico-corte.svg', previewUrl: '/arquivos/projetos/rotina-analogica/quadro-tarefas-analogico-corte-preview.png', download: 'quadro-tarefas-analogico-corte.svg', alt: 'Prévia do arquivo de corte do quadro analógico' },
+      { type: 'stl', title: 'Pino do slider · STL', description: 'Prévia 3D do pino para impressão.', url: '/arquivos/projetos/rotina-analogica/quadro-analogico-pino-slider-tea.stl', download: 'pino-slider-TEA.stl' },
+      { type: 'stl', title: 'Metade do slider · STL', description: 'Prévia 3D da metade do slider para impressão.', url: '/arquivos/projetos/rotina-analogica/quadro-analogico-metade-slider-tea.stl', download: 'metade-slider-TEA.stl' },
+    ],
     needsEquipment: true, createdAt: '2026-09-02',
   },
   {
@@ -55,7 +59,13 @@ export const projects = [
     author: 'Espaço Maker UENP', likes: 9, tags: ['TEA', 'LEDs'], audience: 'Professores',
     materials: ['MDF', 'LEDs', 'Arduino'], tools: ['Máquina de corte', 'Ferro de solda'],
     adaptation: { types: ['Materiais', 'Fabricação digital'], changed: 'Troca os marcadores móveis por LEDs indicadores controlados por Arduino.' },
-    steps: ['Reaproveite o painel de MDF do projeto original.', 'Monte os LEDs e botões em protoboard.', 'Programe a sequência de tarefas.'], createdAt: '2026-09-20',
+    steps: ['Reaproveite o painel de MDF do projeto original.', 'Monte os LEDs e botões em protoboard.', 'Programe a sequência de tarefas.'],
+    resources: [
+      { type: 'svg', title: 'Arquivo de corte do quadro eletrônico', description: 'Desenho vetorial para preparar as peças do quadro.', url: '/arquivos/projetos/rotina-eletronica/quadro-tarefas-eletronico-corte.svg', previewUrl: '/arquivos/projetos/rotina-eletronica/quadro-tarefas-eletronico-corte-preview.png', download: 'quadro-tarefas-eletronico-corte.svg', alt: 'Prévia do arquivo de corte do quadro eletrônico' },
+      { type: 'image', title: 'Prévia do esquema elétrico', url: '/arquivos/projetos/rotina-eletronica/quadro-tarefas-eletronico-esquema.png', alt: 'Esquema elétrico do quadro de tarefas eletrônico' },
+      { type: 'file', title: 'Esquema elétrico completo · PDF', description: 'Abra o diagrama completo em uma nova aba.', url: '/arquivos/projetos/rotina-eletronica/quadro-tarefas-eletronico-esquema.pdf', externalUrl: '/arquivos/projetos/rotina-eletronica/quadro-tarefas-eletronico-esquema.pdf', externalLabel: 'Abrir PDF' },
+      { type: 'embed', title: 'Projeto do quadro no Tinkercad', description: 'Explore a montagem eletrônica e abra uma cópia editável no Tinkercad.', url: 'https://www.tinkercad.com/embed/7hnQ0S9FHCI?editbtn=1', externalUrl: 'https://www.tinkercad.com/embed/7hnQ0S9FHCI?editbtn=1', externalLabel: 'Abrir no Tinkercad' },
+    ], createdAt: '2026-09-20',
   },
   {
     id: 'tabuada', cover: tabuadaCover, title: 'Tabuada Interativa', category: 'Matemática', level: 'Iniciante', duration: '4 horas',
@@ -70,7 +80,12 @@ export const projects = [
     author: 'ACT — Aprendizado, Criatividade e Tecnologia / LIAG — Unicamp', likes: 0, tags: ['Scratch', 'Jogos'], audience: 'Estudantes',
     materials: ['Computador'], tools: ['Scratch'],
     adaptation: { types: ['Fabricação digital', 'Faixa etária'], changed: 'Leva a tabuada física para o computador, com fases e pontuação.' },
-    steps: ['Abra o projeto no Scratch.', 'Personalize os personagens.', 'Teste com a turma.'], createdAt: '2026-10-05',
+    steps: ['Abra o projeto no Scratch.', 'Personalize os personagens.', 'Teste com a turma.'],
+    resources: [
+      { type: 'embed', title: 'Jogue o projeto no Scratch', url: 'https://scratch.mit.edu/projects/698699212/embed', externalUrl: 'https://scratch.mit.edu/projects/698699212/', externalLabel: 'Abrir no Scratch' },
+      { type: 'embed', title: 'Tutorial em vídeo do ACT', url: 'https://www.youtube.com/embed/uPZc5Cifl1o', externalUrl: 'https://www.youtube.com/watch?v=uPZc5Cifl1o', externalLabel: 'Abrir no YouTube' },
+      { type: 'link', title: 'Material original do ACT/LIAG', description: 'Tutorial, glossário e explicação pedagógica do projeto.', url: 'https://liag.ft.unicamp.br/act/2022/06/10/jogo-da-tabuada-scratch-2-0/' },
+    ], createdAt: '2026-10-05',
   },
   {
     id: 'portas-logicas', cover: portasLogicasCover, title: 'Portas Lógicas', category: 'Eletrônica', level: 'Intermediário', duration: '5 horas',
@@ -91,7 +106,12 @@ export const projects = [
     summary: 'Aprenda saídas digitais e temporização construindo um semáforo.',
     author: 'Comunidade ConectaMaker', likes: 11, tags: ['Arduino', 'LEDs'], audience: 'Iniciantes',
     materials: ['Arduino UNO', '3 LEDs', 'Resistores'], tools: ['Protoboard'],
-    steps: ['Ligue os LEDs ao Arduino.', 'Programe a sequência de cores.', 'Ajuste os tempos.'], createdAt: '2026-07-28',
+    steps: ['Ligue os LEDs ao Arduino.', 'Programe a sequência de cores.', 'Ajuste os tempos.'],
+    resources: [
+      { type: 'file', title: 'Semáforo com display · versão incremental', description: 'Código Arduino para LEDs e display de sete segmentos.', url: '/arquivos/projetos/semaforo/exemplo-display-7-seg-incrementado.ino', download: 'exemplo-display-7-seg-incrementado.ino' },
+      { type: 'file', title: 'Semáforo com display · versão simplificada', description: 'Variação do exemplo de semáforo com LEDs e display.', url: '/arquivos/projetos/semaforo/exemplo-display-7-seg-simplificado.ino', download: 'exemplo-display-7-seg-simplificado.ino' },
+      { type: 'file', title: 'Sensor de luminosidade LDR', description: 'Leitura analógica de luz e controle de um LED.', url: '/arquivos/projetos/semaforo/ldr-sensor-decisao-composta.ino', download: 'ldr-sensor-decisao-composta.ino' },
+    ], createdAt: '2026-07-28',
   },
   {
     id: 'jogo-matematica', cover: matematicaScratchCover, title: 'Jogo de matemática com Scratch', category: 'Programação', level: 'Iniciante', duration: '2 horas',
@@ -128,7 +148,10 @@ export const projects = [
     summary: 'Luminária com a silhueta do Cristo e identidade visual do Espaço Maker UENP, apresentada como protótipo de fabricação digital.',
     author: 'Espaço Maker UENP — Cornélio Procópio', likes: 0, tags: ['Corte a laser', 'Acrílico'], audience: 'Público geral',
     materials: ['Acrílico', 'LED'], tools: ['Cortadora a laser'],
-    steps: ['Vetorize a silhueta.', 'Corte o acrílico.', 'Monte a base com LED.'], createdAt: '2026-10-12',
+    steps: ['Vetorize a silhueta.', 'Corte o acrílico.', 'Monte a base com LED.'],
+    resources: [
+      { type: 'svg', title: 'Arquivo de corte da base', description: 'Desenho vetorial original da base da luminária.', url: '/arquivos/projetos/luminaria/luminaria-cristo-base-corte.svg', previewUrl: '/arquivos/projetos/luminaria/luminaria-cristo-base-corte-preview.png', download: 'luminaria-cristo-base-corte.svg', alt: 'Prévia do arquivo de corte da base da luminária' },
+    ], createdAt: '2026-10-12',
   },
 ]
 

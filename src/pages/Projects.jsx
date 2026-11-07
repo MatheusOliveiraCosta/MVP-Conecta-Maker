@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import { LuArrowRight, LuGitBranch, LuHeart, LuPlus, LuDownload, LuArrowLeft, LuExternalLink, LuTrash2 } from 'react-icons/lu'
 import AdaptationTree from '../components/AdaptationTree.jsx'
 import VariantModal from '../components/VariantModal.jsx'
@@ -26,6 +29,104 @@ const isAllowedEmbed = (value) => {
 }
 
 const formatSize = (size) => size < 1024 * 1024 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / 1024 / 1024).toFixed(1)} MB`
+
+function StlPreview({ url, title }) {
+  const mountRef = useRef(null)
+  const [error, setError] = useState(false)
+  useEffect(() => {
+    const container = mountRef.current
+    if (!container) return undefined
+    setError(false)
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color('#edf5f6')
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100)
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    renderer.outputColorSpace = THREE.SRGBColorSpace
+    container.replaceChildren(renderer.domElement)
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableDamping = true
+    controls.dampingFactor = .08
+    controls.enablePan = true
+    controls.minDistance = .6
+    controls.maxDistance = 8
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x7aaeb5, 2.2))
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5)
+    keyLight.position.set(2, 3, 4)
+    scene.add(keyLight)
+    const fillLight = new THREE.DirectionalLight(0x8bd3d1, 1.2)
+    fillLight.position.set(-3, 1, -2)
+    scene.add(fillLight)
+    let mesh
+    let frame
+    let resizeObserver
+    const resize = () => {
+      const width = Math.max(container.clientWidth, 280)
+      const height = Math.max(container.clientHeight, 260)
+      camera.aspect = width / height
+      camera.updateProjectionMatrix()
+      renderer.setSize(width, height, false)
+    }
+    resizeObserver = new ResizeObserver(resize)
+    resizeObserver.observe(container)
+    resize()
+    const loader = new STLLoader()
+    loader.load(url, (geometry) => {
+      geometry.computeVertexNormals()
+      geometry.center()
+      geometry.computeBoundingSphere()
+      const radius = geometry.boundingSphere?.radius || 1
+      geometry.scale(1.35 / radius, 1.35 / radius, 1.35 / radius)
+      mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x318995, roughness: .62, metalness: .08, side: THREE.DoubleSide }))
+      scene.add(mesh)
+      const distance = 3.2
+      camera.position.set(distance, distance * .72, distance * 1.12)
+      controls.target.set(0, 0, 0)
+      controls.update()
+    }, undefined, () => setError(true))
+    const animate = () => {
+      controls.update()
+      renderer.render(scene, camera)
+      frame = requestAnimationFrame(animate)
+    }
+    animate()
+    return () => {
+      cancelAnimationFrame(frame)
+      resizeObserver?.disconnect()
+      controls.dispose()
+      renderer.dispose()
+      mesh?.geometry.dispose()
+      mesh?.material.dispose()
+      container.replaceChildren()
+    }
+  }, [url])
+  return <div className="stl-viewer">
+    <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />
+    {error ? <p className="stl-help error-text">Não foi possível abrir a prévia. Use o download para abrir o STL no seu fatiador.</p> : <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
+  </div>
+}
+
+function ProjectResources({ resources = [] }) {
+  if (!resources.length) return null
+  return <section className="project-resources" aria-label="Arquivos e referências do projeto">
+    <h2>Arquivos e referências</h2>
+    <div className="resource-list">
+      {resources.map((resource) => <article className={`resource-card resource-${resource.type}`} key={`${resource.type}-${resource.url}`}>
+        <div className="resource-head">
+          <div><h3>{resource.title}</h3>{resource.description && <p className="muted">{resource.description}</p>}</div>
+          <div className="actions">
+            {resource.download && <a className="btn btn-secondary btn-sm" href={resource.url} download={resource.download}><LuDownload /> Baixar</a>}
+            {resource.externalUrl && <a className="btn btn-secondary btn-sm" href={resource.externalUrl} target="_blank" rel="noreferrer"><LuExternalLink /> {resource.externalLabel || 'Abrir'}</a>}
+            {!resource.download && !resource.externalUrl && resource.type === 'link' && <a className="btn btn-secondary btn-sm" href={resource.url} target="_blank" rel="noreferrer"><LuExternalLink /> Abrir</a>}
+          </div>
+        </div>
+        {(resource.type === 'svg' || resource.type === 'image') && <a href={resource.previewUrl || resource.url} target="_blank" rel="noreferrer"><img className="resource-image" src={resource.previewUrl || resource.url} alt={resource.alt || resource.title} loading="lazy" /></a>}
+        {resource.type === 'stl' && <StlPreview url={resource.url} title={resource.title} />}
+        {resource.type === 'embed' && <iframe className="resource-embed" title={resource.title} src={resource.url} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />}
+      </article>)}
+    </div>
+  </section>
+}
 
 export function ProjectCard({ p, parent }) {
   const { state } = useStore()
@@ -131,16 +232,7 @@ export function ProjectDetail({ id }) {
 
         {p.topics?.length ? <ProjectTopics topics={p.topics} /> : <><h2>Etapas de execução</h2><ol className="steps">{p.steps?.map((s, i) => <li key={i}>{s}</li>)}</ol></>}
 
-        {p.files && (
-          <>
-            <h2>Arquivo de corte do quadro analógico</h2>
-            <p className="muted">Desenho vetorial original com painel, laterais, números, meses e ícones das tarefas. Confira medidas, material e parâmetros da máquina antes do corte.</p>
-            <button className="btn btn-primary" onClick={() => notify('Download demonstrativo: no MVP não há arquivo real.')}>{p.files.svg} ↓</button>
-            <h2>Peças para impressão 3D</h2>
-            <p className="muted">Arquivos STL do pino e da metade do slider do quadro analógico. Prepare os modelos em um fatiador e confira as dimensões antes de imprimir.</p>
-            <div className="actions">{p.files.stl.map((f) => <button key={f} className="btn btn-secondary btn-sm" onClick={() => notify('Download demonstrativo: no MVP não há arquivo real.')}>{f} <LuDownload /></button>)}</div>
-          </>
-        )}
+        <ProjectResources resources={p.resources} />
 
         <AdaptationTree projects={projects} currentId={p.id} highlightId={highlight} onCreate={setVariantFor} />
 
