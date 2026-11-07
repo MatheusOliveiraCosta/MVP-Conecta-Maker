@@ -38,6 +38,138 @@ const isAllowedEmbed = (value) => {
 
 const formatSize = (size) => size < 1024 * 1024 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / 1024 / 1024).toFixed(1)} MB`
 
+function SoftwareStlPreview({ url, title }) {
+  const canvasRef = useRef(null)
+  const [status, setStatus] = useState('loading')
+  const modelRef = useRef(null)
+  const viewRef = useRef({ yaw: .55, pitch: .45, zoom: 1 })
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return undefined
+    const context = canvas.getContext('2d')
+    if (!context) {
+      setStatus('error')
+      return undefined
+    }
+    let disposed = false
+    let frame
+    const controller = new AbortController()
+    const loader = new STLLoader()
+
+    const draw = () => {
+      if (disposed || !modelRef.current) return
+      const { triangles } = modelRef.current
+      const { yaw, pitch, zoom } = viewRef.current
+      const width = canvas.clientWidth || 280
+      const height = canvas.clientHeight || 260
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      canvas.width = Math.round(width * dpr)
+      canvas.height = Math.round(height * dpr)
+      context.setTransform(dpr, 0, 0, dpr, 0, 0)
+      context.fillStyle = '#edf5f6'
+      context.fillRect(0, 0, width, height)
+      const cosY = Math.cos(yaw), sinY = Math.sin(yaw)
+      const cosX = Math.cos(pitch), sinX = Math.sin(pitch)
+      const scale = Math.min(width, height) * .34 * zoom
+      const project = ([x, y, z]) => {
+        const rotatedX = x * cosY - z * sinY
+        const rotatedZ = x * sinY + z * cosY
+        const rotatedY = y * cosX - rotatedZ * sinX
+        const depth = y * sinX + rotatedZ * cosX + 4
+        return [width / 2 + rotatedX * scale / depth, height / 2 - rotatedY * scale / depth, depth]
+      }
+      const projected = triangles.map((triangle) => triangle.map(project))
+      projected.sort((a, b) => (a[0][2] + a[1][2] + a[2][2]) - (b[0][2] + b[1][2] + b[2][2]))
+      for (const triangle of projected) {
+        const [a, b, c] = triangle
+        const cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+        const light = Math.max(.35, Math.min(1, .55 + Math.abs(cross) / (scale * scale * .08)))
+        context.beginPath()
+        context.moveTo(a[0], a[1])
+        context.lineTo(b[0], b[1])
+        context.lineTo(c[0], c[1])
+        context.closePath()
+        context.fillStyle = `rgb(${Math.round(49 * light)}, ${Math.round(137 * light)}, ${Math.round(149 * light)})`
+        context.fill()
+      }
+    }
+    const scheduleDraw = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(draw)
+    }
+    const resizeObserver = new ResizeObserver(scheduleDraw)
+    resizeObserver.observe(canvas)
+    const onPointerDown = (event) => {
+      canvas.setPointerCapture(event.pointerId)
+      canvas.dataset.dragX = event.clientX
+      canvas.dataset.dragY = event.clientY
+    }
+    const onPointerMove = (event) => {
+      if (!canvas.hasPointerCapture(event.pointerId)) return
+      const previousX = Number(canvas.dataset.dragX)
+      const previousY = Number(canvas.dataset.dragY)
+      viewRef.current.yaw += (event.clientX - previousX) * .01
+      viewRef.current.pitch = Math.max(-1.4, Math.min(1.4, viewRef.current.pitch + (event.clientY - previousY) * .01))
+      canvas.dataset.dragX = event.clientX
+      canvas.dataset.dragY = event.clientY
+      scheduleDraw()
+    }
+    const onWheel = (event) => {
+      event.preventDefault()
+      viewRef.current.zoom = Math.max(.45, Math.min(2.8, viewRef.current.zoom * (event.deltaY < 0 ? 1.1 : .9)))
+      scheduleDraw()
+    }
+    canvas.addEventListener('pointerdown', onPointerDown)
+    canvas.addEventListener('pointermove', onPointerMove)
+    canvas.addEventListener('wheel', onWheel, { passive: false })
+
+    fetch(resolveAssetUrl(url), { signal: controller.signal, cache: 'no-cache' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`STL indisponível (${response.status})`)
+        return response.arrayBuffer()
+      })
+      .then((buffer) => {
+        const geometry = loader.parse(buffer)
+        geometry.center()
+        geometry.computeBoundingSphere()
+        geometry.scale(1.35 / (geometry.boundingSphere?.radius || 1), 1.35 / (geometry.boundingSphere?.radius || 1), 1.35 / (geometry.boundingSphere?.radius || 1))
+        const positions = geometry.getAttribute('position').array
+        const triangles = []
+        for (let index = 0; index < positions.length; index += 9) {
+          triangles.push([
+            [positions[index], positions[index + 1], positions[index + 2]],
+            [positions[index + 3], positions[index + 4], positions[index + 5]],
+            [positions[index + 6], positions[index + 7], positions[index + 8]],
+          ])
+        }
+        geometry.dispose()
+        if (disposed) return
+        modelRef.current = { triangles }
+        setStatus('ready')
+        scheduleDraw()
+      })
+      .catch((error) => {
+        if (!disposed && error.name !== 'AbortError') setStatus('error')
+      })
+
+    return () => {
+      disposed = true
+      controller.abort()
+      cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+      canvas.removeEventListener('pointerdown', onPointerDown)
+      canvas.removeEventListener('pointermove', onPointerMove)
+      canvas.removeEventListener('wheel', onWheel)
+    }
+  }, [url])
+
+  return <div className="stl-viewer">
+    {status === 'error' ? <div className="stl-fallback" role="img" aria-label={`Prévia 3D indisponível de ${title}`}><span aria-hidden="true">◇</span><p>Não foi possível renderizar este STL.</p><small>Use o botão “Baixar” para abrir o STL em um fatiador.</small></div> : <canvas className="stl-preview" ref={canvasRef} role="img" aria-label={`Prévia 3D de ${title}`} />}
+    {status === 'ready' && <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom</p>}
+  </div>
+}
+
 function StlPreview({ url, title }) {
   const mountRef = useRef(null)
   const [status, setStatus] = useState('loading')
@@ -60,7 +192,7 @@ function StlPreview({ url, title }) {
     }
     const requestTimeout = setTimeout(() => {
       requestController.abort()
-      fail()
+      setStatus('software')
     }, 15000)
 
     const render = () => {
@@ -164,6 +296,7 @@ function StlPreview({ url, title }) {
       container.replaceChildren()
     }
   }, [url])
+  if (status === 'software') return <SoftwareStlPreview url={url} title={title} />
   return <div className="stl-viewer">
     {status === 'error' ? <div className="stl-fallback" role="img" aria-label={`Prévia 3D indisponível de ${title}`}><span aria-hidden="true">◇</span><p>Prévia 3D indisponível neste dispositivo.</p><small>Use o botão “Baixar” para abrir o STL em um fatiador.</small></div> : <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />}
     {status === 'ready' && <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
