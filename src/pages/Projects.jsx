@@ -52,11 +52,16 @@ function StlPreview({ url, title }) {
     let mesh
     let renderer
     let controls
+    const requestController = new AbortController()
     setStatus('loading')
 
     const fail = () => {
       if (!disposed) setStatus('error')
     }
+    const requestTimeout = setTimeout(() => {
+      requestController.abort()
+      fail()
+    }, 15000)
 
     const render = () => {
       if (disposed) return
@@ -78,7 +83,11 @@ function StlPreview({ url, title }) {
       renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' })
     } catch {
       fail()
-      return () => { disposed = true }
+      return () => {
+        disposed = true
+        clearTimeout(requestTimeout)
+        requestController.abort()
+      }
     }
     scene.background = new THREE.Color('#edf5f6')
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
@@ -113,27 +122,38 @@ function StlPreview({ url, title }) {
     }, { rootMargin: '160px' })
     visibilityObserver.observe(container)
     const loader = new STLLoader()
-    loader.load(resolveAssetUrl(url), (geometry) => {
-      if (disposed) {
-        geometry.dispose()
-        return
+    const loadModel = async () => {
+      try {
+        const response = await fetch(resolveAssetUrl(url), { signal: requestController.signal, cache: 'no-cache' })
+        if (!response.ok) throw new Error(`STL indisponível (${response.status})`)
+        const geometry = loader.parse(await response.arrayBuffer())
+        if (disposed) {
+          geometry.dispose()
+          return
+        }
+        geometry.computeVertexNormals()
+        geometry.center()
+        geometry.computeBoundingSphere()
+        const radius = geometry.boundingSphere?.radius || 1
+        geometry.scale(1.35 / radius, 1.35 / radius, 1.35 / radius)
+        mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x318995, roughness: .62, metalness: .08, side: THREE.DoubleSide }))
+        scene.add(mesh)
+        const distance = 3.2
+        camera.position.set(distance, distance * .72, distance * 1.12)
+        controls.target.set(0, 0, 0)
+        controls.update()
+        setStatus('ready')
+        if (active && !frame) render()
+      } catch (error) {
+        if (!disposed && error.name !== 'AbortError') fail()
+      } finally {
+        clearTimeout(requestTimeout)
       }
-      geometry.computeVertexNormals()
-      geometry.center()
-      geometry.computeBoundingSphere()
-      const radius = geometry.boundingSphere?.radius || 1
-      geometry.scale(1.35 / radius, 1.35 / radius, 1.35 / radius)
-      mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x318995, roughness: .62, metalness: .08, side: THREE.DoubleSide }))
-      scene.add(mesh)
-      const distance = 3.2
-      camera.position.set(distance, distance * .72, distance * 1.12)
-      controls.target.set(0, 0, 0)
-      controls.update()
-      setStatus('ready')
-      if (active && !frame) render()
-    }, undefined, fail)
+    }
+    loadModel()
     return () => {
       disposed = true
+      requestController.abort()
       cancelAnimationFrame(frame)
       resizeObserver?.disconnect()
       visibilityObserver?.disconnect()
