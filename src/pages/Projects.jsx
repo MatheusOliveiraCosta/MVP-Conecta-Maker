@@ -32,19 +32,51 @@ const formatSize = (size) => size < 1024 * 1024 ? `${Math.max(1, Math.round(size
 
 function StlPreview({ url, title }) {
   const mountRef = useRef(null)
-  const [error, setError] = useState(false)
+  const [status, setStatus] = useState('loading')
   useEffect(() => {
     const container = mountRef.current
     if (!container) return undefined
-    setError(false)
+    let disposed = false
+    let active = false
+    let frame
+    let resizeObserver
+    let visibilityObserver
+    let mesh
+    let renderer
+    let controls
+    setStatus('loading')
+
+    const fail = () => {
+      if (!disposed) setStatus('error')
+    }
+
+    const render = () => {
+      if (disposed) return
+      if (!active) {
+        frame = undefined
+        return
+      }
+      controls?.update()
+      renderer?.render(scene, camera)
+      frame = requestAnimationFrame(render)
+    }
+
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color('#edf5f6')
     const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    try {
+      const probe = document.createElement('canvas')
+      const webgl = probe.getContext('webgl') || probe.getContext('experimental-webgl')
+      if (!webgl) throw new Error('WebGL indisponível')
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' })
+    } catch {
+      fail()
+      return () => { disposed = true }
+    }
+    scene.background = new THREE.Color('#edf5f6')
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     container.replaceChildren(renderer.domElement)
-    const controls = new OrbitControls(camera, renderer.domElement)
+    controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.dampingFactor = .08
     controls.enablePan = true
@@ -57,9 +89,6 @@ function StlPreview({ url, title }) {
     const fillLight = new THREE.DirectionalLight(0x8bd3d1, 1.2)
     fillLight.position.set(-3, 1, -2)
     scene.add(fillLight)
-    let mesh
-    let frame
-    let resizeObserver
     const resize = () => {
       const width = Math.max(container.clientWidth, 280)
       const height = Math.max(container.clientHeight, 260)
@@ -70,8 +99,17 @@ function StlPreview({ url, title }) {
     resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(container)
     resize()
+    visibilityObserver = new IntersectionObserver(([entry]) => {
+      active = entry.isIntersecting
+      if (active && !frame) render()
+    }, { rootMargin: '160px' })
+    visibilityObserver.observe(container)
     const loader = new STLLoader()
-    loader.load(url, (geometry) => {
+    loader.load(new URL(url, document.baseURI).href, (geometry) => {
+      if (disposed) {
+        geometry.dispose()
+        return
+      }
       geometry.computeVertexNormals()
       geometry.center()
       geometry.computeBoundingSphere()
@@ -83,16 +121,14 @@ function StlPreview({ url, title }) {
       camera.position.set(distance, distance * .72, distance * 1.12)
       controls.target.set(0, 0, 0)
       controls.update()
-    }, undefined, () => setError(true))
-    const animate = () => {
-      controls.update()
-      renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
-    }
-    animate()
+      setStatus('ready')
+      if (active && !frame) render()
+    }, undefined, fail)
     return () => {
+      disposed = true
       cancelAnimationFrame(frame)
       resizeObserver?.disconnect()
+      visibilityObserver?.disconnect()
       controls.dispose()
       renderer.dispose()
       mesh?.geometry.dispose()
@@ -101,8 +137,8 @@ function StlPreview({ url, title }) {
     }
   }, [url])
   return <div className="stl-viewer">
-    <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />
-    {error ? <p className="stl-help error-text">Não foi possível abrir a prévia. Use o download para abrir o STL no seu fatiador.</p> : <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
+    {status === 'error' ? <div className="stl-fallback" role="img" aria-label={`Prévia 3D indisponível de ${title}`}><span aria-hidden="true">◇</span><p>Prévia 3D indisponível neste dispositivo.</p><small>Use o botão “Baixar” para abrir o STL em um fatiador.</small></div> : <div className="stl-preview" ref={mountRef} role="img" aria-label={`Prévia 3D de ${title}`} />}
+    {status === 'ready' && <p className="stl-help">Arraste para girar · roda do mouse ou pinça para zoom · botão direito para mover</p>}
   </div>
 }
 
