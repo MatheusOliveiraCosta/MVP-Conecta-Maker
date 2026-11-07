@@ -329,7 +329,7 @@ export function Projects() {
         <Link to="/projetos/novo" className="btn btn-secondary"><LuPlus /> Novo projeto</Link>
       </div>
       <p className="muted small" aria-live="polite">{list.length} projeto(s) encontrado(s)</p>
-      {list.length ? <div className="grid grid-2 stagger">{list.map((p, i) => <div key={p.id} style={{ '--i': i }}><ProjectCard p={p} parent={p.parentId} /></div>)}</div>
+      {list.length ? <div className="grid grid-3 stagger">{list.map((p, i) => <div key={p.id} style={{ '--i': i }}><ProjectCard p={p} parent={p.parentId} /></div>)}</div>
         : <div className="empty"><p>Nenhum projeto encontrado. Tente outro termo ou filtro.</p></div>}
     </>
   )
